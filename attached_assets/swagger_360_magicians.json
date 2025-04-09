@@ -1,0 +1,395 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "360 Magicians API",
+    "version": "1.0.0",
+    "description": "Unified API structure for the 360 Magicians ecosystem (Job, Business, VR4Deaf, Admin)"
+  },
+  "servers": [
+    {
+      "url": "https://api.mbtquniverse.com"
+    }
+  ],
+  "paths": {
+    "/api/idea/intake": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/readiness-check": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/path-selection": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/assessment-results": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/vr/eligibility-check": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/vr/referral-request": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/idea/user-profile": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/project-init": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/app-stack-config": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/notion-template-sync": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/ai-agent/setup": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/workspace/connect": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/files/organize": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/dev-role/access": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/auth/oauth": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/user/device-sync": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/build/git/sync": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/subscription/create": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/subscription/verify": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/blog/auto": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/marketing/videos": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/social/post": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/grow/ai/insights": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/checkpoints/update": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/progress/track": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/automations/trigger": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/vrs/report": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/stream/log": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/ai/chat": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/video/submit": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/manage/kb/entry": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/internal/health": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/internal/version": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/internal/logs": {
+      "get": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/test/insomnia": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/test/kong/register": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/admin/firewall/configure": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/api/admin/domain/routing": {
+      "post": {
+        "summary": "Auto-generated endpoint",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    }
+  }
+}

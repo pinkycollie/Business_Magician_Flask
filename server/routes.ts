@@ -13,11 +13,15 @@ import {
   insertVRCounselorSchema,
   insertUserCounselorSchema
 } from "@shared/schema";
+import storageRoutes from "./routes/storage";
 
 // Validation error handling
 import { fromZodError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register storage routes
+  app.use('/api/storage', storageRoutes);
+
   // Base API route
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
