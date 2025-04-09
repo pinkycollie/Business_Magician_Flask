@@ -6,6 +6,7 @@ import MVPSuccessStories from '@/components/home/MVPSuccessStories';
 import ASLResourceCard from '@/components/asl/ASLResourceCard';
 import BusinessMagicianGPT from '@/components/tools/BusinessMagicianGPT';
 import TelegramBotLink from '@/components/tools/TelegramBotLink';
+import VR4DeafBotLink from '@/components/tools/VR4DeafBotLink';
 import { useQuery } from '@tanstack/react-query';
 import { initializeHtmx } from '@/lib/htmx';
 
@@ -120,10 +121,11 @@ const IdeaPhase: React.FC = () => {
         </div>
 
         {/* Your Business Magician Assistants */}
-        <h3 className="text-xl font-bold mb-4 font-heading text-slate-800">Your AI Business Assistants</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <h3 className="text-xl font-bold mb-4 font-heading text-slate-800">Your Business Assistants</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <BusinessMagicianGPT />
           <TelegramBotLink />
+          <VR4DeafBotLink />
         </div>
 
         {/* MVP Success Case Studies */}
