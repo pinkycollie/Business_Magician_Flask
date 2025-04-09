@@ -5,15 +5,21 @@ interface BotCommand {
 
 export const businessMagicianBotCommands: BotCommand[] = [
   { command: "start", description: "Begin your business journey" },
-  { command: "idea", description: "Business idea generation and validation" },
-  { command: "build", description: "Formation and startup resources" },
-  { command: "grow", description: "Marketing and scaling strategies" },
-  { command: "manage", description: "Business management tools" },
-  { command: "asl", description: "Access ASL video resources" },
-  { command: "vr", description: "Connect with vocational rehabilitation" },
-  { command: "jobs", description: "Find qualified deaf candidates" },
-  { command: "funding", description: "Discover grants and funding for deaf entrepreneurs" },
-  { command: "help", description: "List all available commands" },
+  { command: "idea", description: "Generate and refine business ideas" },
+  { command: "management", description: "Organize and manage project tasks" },
+  { command: "brand", description: "Develop and establish brand identity" },
+  { command: "marketing", description: "Create marketing strategies and campaigns" },
+  { command: "mvp", description: "Build minimum viable products (MVPs)" },
+  { command: "feedback", description: "Provide feedback on the application or services" },
+  { command: "completion", description: "Manage project completion and delivery" },
+  { command: "expansion", description: "Plan and execute business expansion strategies" },
+  { command: "partnership", description: "Establish equity partnership agreements" },
+  { command: "help", description: "Get assistance and guidance" },
+  { command: "support", description: "Reach out for technical support" },
+  { command: "upload", description: "Upload documents and files securely" },
+  { command: "search", description: "Search for specific information or resources" },
+  { command: "contact", description: "Contact support or customer service" },
+  { command: "about", description: "Learn more about the application or company" },
 ];
 
 /**

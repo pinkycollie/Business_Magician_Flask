@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Copy, Check } from 'lucide-react';
+import { ExternalLink, Copy, Check, Globe } from 'lucide-react';
+import { brandColors } from '@/lib/brandKit';
 
 interface VR4DeafBotLinkProps {
   title?: string;
@@ -16,7 +17,10 @@ const VR4DeafBotLink: React.FC<VR4DeafBotLinkProps> = ({
   linkText = 'Chat with VR4Deaf Bot',
   botUsername = 'vr4deaf_bot'
 }) => {
+  // Telegram bot URL
   const telegramUrl = `https://t.me/${botUsername}`;
+  // Website URL
+  const websiteUrl = 'https://360businessmagician.mbtquniverse.com';
   const [copied, setCopied] = useState(false);
   
   const vatBotCommands = [
@@ -51,17 +55,28 @@ const VR4DeafBotLink: React.FC<VR4DeafBotLinkProps> = ({
   
   return (
     <Card className="bg-white overflow-hidden border-primary/20 hover:border-primary/50 transition-colors">
-      <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-400/5 border-b border-slate-100">
+      <CardHeader 
+        style={{ 
+          background: `linear-gradient(to right, ${brandColors.vr.primary}10, ${brandColors.vr.accent}10)`,
+          borderBottom: `1px solid ${brandColors.vr.secondary}50`
+        }}
+      >
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">
+          <div 
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+            style={{ 
+              background: brandColors.vr.primary,
+              border: `2px solid ${brandColors.vr.accent}`
+            }}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m22 2-7 20-4-9-9-4Z" />
               <path d="M22 2 11 13" />
             </svg>
           </div>
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardTitle className="text-lg" style={{ color: brandColors.vr.text.primary }}>{title}</CardTitle>
         </div>
-        <CardDescription className="text-sm">{description}</CardDescription>
+        <CardDescription className="text-sm" style={{ color: brandColors.vr.text.secondary }}>{description}</CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-2">
@@ -75,14 +90,44 @@ const VR4DeafBotLink: React.FC<VR4DeafBotLinkProps> = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="border-t border-slate-100 px-6 py-4 flex flex-col gap-2">
+      <CardFooter 
+        className="border-t px-6 py-4 flex flex-col gap-2"
+        style={{ borderColor: brandColors.vr.secondary }}
+      >
         <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="w-full">
-          <Button className="w-full gap-2 bg-purple-500 hover:bg-purple-600">
+          <Button 
+            className="w-full gap-2" 
+            style={{ 
+              backgroundColor: brandColors.vr.primary,
+              color: brandColors.vr.text.light,
+            }}
+          >
             {linkText} <ExternalLink size={16} />
           </Button>
         </a>
         
-        <Button onClick={copyCommands} variant="outline" className="w-full gap-2 border-purple-200 text-purple-600 hover:bg-purple-50">
+        <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="w-full">
+          <Button 
+            variant="outline"
+            className="w-full gap-2" 
+            style={{ 
+              borderColor: `${brandColors.vr.accent}50`,
+              color: brandColors.vr.primary,
+            }}
+          >
+            Visit VR4Deaf Website <Globe size={16} />
+          </Button>
+        </a>
+        
+        <Button 
+          onClick={copyCommands} 
+          variant="outline" 
+          className="w-full gap-2"
+          style={{ 
+            borderColor: `${brandColors.vr.secondary}50`,
+            color: brandColors.vr.accent,
+          }}
+        >
           {copied ? (
             <>
               <Check size={16} /> Commands Copied
