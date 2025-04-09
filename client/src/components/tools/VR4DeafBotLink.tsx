@@ -20,7 +20,7 @@ const VR4DeafBotLink: React.FC<VR4DeafBotLinkProps> = ({
   // Telegram bot URL
   const telegramUrl = `https://t.me/${botUsername}`;
   // Website URL
-  const websiteUrl = 'https://360businessmagician.mbtquniverse.com';
+  const websiteUrl = 'https://vr4deaf.mbtquniverse.com';
   const [copied, setCopied] = useState(false);
   
   const vatBotCommands = [
