@@ -12,6 +12,7 @@ import BuildPhase from "@/pages/BuildPhase";
 import GrowPhase from "@/pages/GrowPhase";
 import ManagePhase from "@/pages/ManagePhase";
 import StoragePage from "@/pages/StoragePage";
+import ResourceLibraryPage from "@/pages/ResourceLibraryPage";
 
 function Router() {
   const [initialFetchCompleted, setInitialFetchCompleted] = useState(false);
@@ -58,6 +59,7 @@ function Router() {
           <Route path="/phases/grow" component={GrowPhase} />
           <Route path="/phases/manage" component={ManagePhase} />
           <Route path="/storage" component={StoragePage} />
+          <Route path="/resources" component={ResourceLibraryPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

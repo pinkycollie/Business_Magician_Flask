@@ -10,10 +10,13 @@ const ResourceLibraryPage = () => {
     staleTime: 60000,
   });
 
-  const resourcesASLVideo = aslVideos?.find((video) => 
-    video.title.toLowerCase().includes('resource') || 
-    video.description.toLowerCase().includes('resource library')
-  );
+  // Type-safe find operation with fallback
+  const resourcesASLVideo = Array.isArray(aslVideos) 
+    ? aslVideos.find((video: any) => 
+        video.title.toLowerCase().includes('resource') || 
+        video.description.toLowerCase().includes('resource library')
+      ) 
+    : null;
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -63,7 +66,6 @@ const ResourceLibraryPage = () => {
                 {resourcesASLVideo ? (
                   <ASLVideo
                     title={resourcesASLVideo.title}
-                    description={resourcesASLVideo.description}
                     videoUrl={resourcesASLVideo.videoUrl}
                   />
                 ) : (

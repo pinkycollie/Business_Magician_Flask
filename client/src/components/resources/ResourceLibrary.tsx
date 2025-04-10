@@ -28,7 +28,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { SiFile } from 'react-icons/si';
+// Import icons from lucide-react only
+// Removed SiFile as it doesn't exist
 import { Link } from 'wouter';
 import {
   FileText,
@@ -133,7 +134,8 @@ const ResourceLibrary = () => {
     staleTime: 60000,
   });
 
-  const filteredResources = resources?.filter((resource: Resource) => {
+  // Ensure resources is an array before filtering
+  const filteredResources = Array.isArray(resources) ? resources.filter((resource: Resource) => {
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();

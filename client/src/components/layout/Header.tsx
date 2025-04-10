@@ -49,7 +49,7 @@ const Header: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#">
+                <Link href="/resources">
                   <a className="text-slate-600 hover:text-primary font-medium">Resources</a>
                 </Link>
               </li>
