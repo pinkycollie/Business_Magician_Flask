@@ -5,6 +5,7 @@ import { initializeHtmx } from '@/lib/htmx';
 import { useQuery } from '@tanstack/react-query';
 import JobMagicianSection from '@/components/hiring/JobMagicianSection';
 import BusinessIdeaGenerator from '@/components/tools/BusinessIdeaGenerator';
+import SelfEmploymentPricing from '@/components/pricing/SelfEmploymentPricing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LifecyclePhase {
@@ -73,8 +74,9 @@ const BuildPhase: React.FC = () => {
         ) : (
           // Unlocked phase content
           <Tabs defaultValue="business" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="business">Business Formation</TabsTrigger>
+              <TabsTrigger value="funding">VR Funding</TabsTrigger>
               <TabsTrigger value="hiring">Hiring</TabsTrigger>
               <TabsTrigger value="ai">AI Tools</TabsTrigger>
             </TabsList>
@@ -138,6 +140,17 @@ const BuildPhase: React.FC = () => {
             
             <TabsContent value="hiring">
               <JobMagicianSection />
+            </TabsContent>
+            
+            <TabsContent value="funding">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+                <h3 className="text-xl font-bold mb-4 text-slate-800">VR Funding & Self-Employment Services</h3>
+                <p className="text-slate-600 mb-4">
+                  Vocational Rehabilitation can provide funding support for deaf entrepreneurs. 
+                  Review the benchmark costs and service pricing to help plan your business budget.
+                </p>
+                <SelfEmploymentPricing />
+              </div>
             </TabsContent>
             
             <TabsContent value="ai">
