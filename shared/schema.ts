@@ -213,3 +213,36 @@ export type InsertVRCounselor = z.infer<typeof insertVRCounselorSchema>;
 
 export type UserCounselor = typeof userCounselors.$inferSelect;
 export type InsertUserCounselor = z.infer<typeof insertUserCounselorSchema>;
+
+// Resource Library
+export const resources = pgTable("resources", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  subcategory: text("subcategory"),
+  source: text("source").notNull(),
+  url: text("url"),
+  fileUrl: text("file_url"),
+  thumbnailUrl: text("thumbnail_url"),
+  tags: text("tags").array(),
+  sbaRelated: boolean("sba_related").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertResourceSchema = createInsertSchema(resources).pick({
+  title: true,
+  description: true,
+  category: true,
+  subcategory: true,
+  source: true,
+  url: true,
+  fileUrl: true,
+  thumbnailUrl: true,
+  tags: true,
+  sbaRelated: true,
+});
+
+export type Resource = typeof resources.$inferSelect;
+export type InsertResource = z.infer<typeof insertResourceSchema>;

@@ -8,7 +8,8 @@ import {
   userProgress, type UserProgress, type InsertUserProgress,
   businesses, type Business, type InsertBusiness,
   vrCounselors, type VRCounselor, type InsertVRCounselor,
-  userCounselors, type UserCounselor, type InsertUserCounselor
+  userCounselors, type UserCounselor, type InsertUserCounselor,
+  resources, type Resource, type InsertResource
 } from "@shared/schema";
 
 export interface IStorage {
@@ -62,6 +63,17 @@ export interface IStorage {
   // User-Counselor relationships
   getUserCounselors(userId: number): Promise<(UserCounselor & { counselor: VRCounselor })[]>;
   createUserCounselor(relation: InsertUserCounselor): Promise<UserCounselor>;
+  
+  // Resource Library
+  getResources(params?: { 
+    category?: string; 
+    sbaRelated?: boolean;
+    tags?: string[];
+  }): Promise<Resource[]>;
+  getResource(id: number): Promise<Resource | undefined>;
+  createResource(resource: InsertResource): Promise<Resource>;
+  updateResource(id: number, data: Partial<InsertResource>): Promise<Resource>;
+  deleteResource(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -75,6 +87,7 @@ export class MemStorage implements IStorage {
   private businesses: Map<number, Business>;
   private vrCounselors: Map<number, VRCounselor>;
   private userCounselors: Map<number, UserCounselor>;
+  private resources: Map<number, Resource>;
   
   private userIdCounter: number;
   private phaseIdCounter: number;
@@ -86,6 +99,7 @@ export class MemStorage implements IStorage {
   private businessIdCounter: number;
   private counselorIdCounter: number;
   private userCounselorIdCounter: number;
+  private resourceIdCounter: number;
 
   constructor() {
     this.users = new Map();
@@ -98,6 +112,7 @@ export class MemStorage implements IStorage {
     this.businesses = new Map();
     this.vrCounselors = new Map();
     this.userCounselors = new Map();
+    this.resources = new Map();
     
     this.userIdCounter = 1;
     this.phaseIdCounter = 1;
@@ -109,6 +124,7 @@ export class MemStorage implements IStorage {
     this.businessIdCounter = 1;
     this.counselorIdCounter = 1;
     this.userCounselorIdCounter = 1;
+    this.resourceIdCounter = 1;
     
     // Initialize with seed data
     this.seedData();
@@ -347,6 +363,73 @@ export class MemStorage implements IStorage {
     };
     this.userCounselors.set(id, relation);
     return relation;
+  }
+  
+  // Resource Library methods
+  async getResources(params?: { 
+    category?: string; 
+    sbaRelated?: boolean;
+    tags?: string[];
+  }): Promise<Resource[]> {
+    let resources = Array.from(this.resources.values());
+    
+    if (params) {
+      if (params.category) {
+        resources = resources.filter(resource => resource.category === params.category);
+      }
+      
+      if (params.sbaRelated !== undefined) {
+        resources = resources.filter(resource => resource.sbaRelated === params.sbaRelated);
+      }
+      
+      if (params.tags && params.tags.length > 0) {
+        resources = resources.filter(resource => {
+          if (!resource.tags) return false;
+          return params.tags!.some(tag => resource.tags!.includes(tag));
+        });
+      }
+    }
+    
+    return resources;
+  }
+  
+  async getResource(id: number): Promise<Resource | undefined> {
+    return this.resources.get(id);
+  }
+  
+  async createResource(resource: InsertResource): Promise<Resource> {
+    const id = this.resourceIdCounter++;
+    const newResource: Resource = { 
+      ...resource, 
+      id, 
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.resources.set(id, newResource);
+    return newResource;
+  }
+  
+  async updateResource(id: number, data: Partial<InsertResource>): Promise<Resource> {
+    const resource = this.resources.get(id);
+    if (!resource) {
+      throw new Error(`Resource with id ${id} not found`);
+    }
+    
+    const updatedResource: Resource = { 
+      ...resource, 
+      ...data, 
+      updatedAt: new Date() 
+    };
+    this.resources.set(id, updatedResource);
+    return updatedResource;
+  }
+  
+  async deleteResource(id: number): Promise<void> {
+    if (!this.resources.has(id)) {
+      throw new Error(`Resource with id ${id} not found`);
+    }
+    
+    this.resources.delete(id);
   }
 
   // Seed initial data for development
