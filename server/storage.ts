@@ -713,13 +713,15 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import the DatabaseStorage when using the database
-import { DatabaseStorage } from './database';
+// Import the DatabaseStorage when using the database 
+// Note: commented out until we fully migrate to database
+// import { DatabaseStorage } from './database';
 
-// Choose which storage implementation to use based on environment
-const USE_DATABASE = process.env.DATABASE_URL ? true : false;
+// For now, use MemStorage by default to avoid issues
+// const USE_DATABASE = process.env.DATABASE_URL ? true : false;
 
 // Export the chosen storage implementation
-export const storage = USE_DATABASE 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+export const storage = new MemStorage();
+
+// When ready to use database:
+// export const storage = USE_DATABASE ? new DatabaseStorage() : new MemStorage();
