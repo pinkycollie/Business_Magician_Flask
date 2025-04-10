@@ -11,7 +11,8 @@ import {
   insertASLVideoSchema,
   insertBusinessSchema,
   insertVRCounselorSchema,
-  insertUserCounselorSchema
+  insertUserCounselorSchema,
+  insertResourceSchema
 } from "@shared/schema";
 import storageRoutes from "./routes/storage";
 
@@ -345,6 +346,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ error: "Internal server error" });
       }
+    }
+  });
+
+  // Resources routes
+  app.get("/api/resources", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const sbaRelated = req.query.sbaRelated === 'true' ? true 
+                       : req.query.sbaRelated === 'false' ? false 
+                       : undefined;
+      
+      const tags = req.query.tags ? 
+        Array.isArray(req.query.tags) 
+          ? req.query.tags as string[] 
+          : [req.query.tags as string]
+        : undefined;
+      
+      const resources = await storage.getResources({ category, sbaRelated, tags });
+      res.json(resources);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/resources/:id", async (req, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ error: "Resource not found" });
+      }
+      res.json(resource);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/resources", async (req, res) => {
+    try {
+      const resourceData = insertResourceSchema.parse(req.body);
+      const resource = await storage.createResource(resourceData);
+      res.status(201).json(resource);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: fromZodError(error).message });
+      } else {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  });
+
+  app.patch("/api/resources/:id", async (req, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      // Partial validation
+      const updateSchema = insertResourceSchema.partial();
+      const resourceData = updateSchema.parse(req.body);
+      
+      const resource = await storage.updateResource(resourceId, resourceData);
+      res.json(resource);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: fromZodError(error).message });
+      } else {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  });
+
+  app.delete("/api/resources/:id", async (req, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      await storage.deleteResource(resourceId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 

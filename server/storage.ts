@@ -624,6 +624,92 @@ export class MemStorage implements IStorage {
       const id = this.counselorIdCounter++;
       this.vrCounselors.set(id, { ...counselor, id });
     });
+    
+    // Initial Resources
+    const resources = [
+      {
+        title: "SBA Business Guide for New Entrepreneurs",
+        description: "Comprehensive guide from the Small Business Administration for new entrepreneurs starting their business journey",
+        category: "Business Planning",
+        subcategory: "Getting Started",
+        source: "Small Business Administration",
+        url: "https://www.sba.gov/business-guide",
+        fileUrl: null,
+        thumbnailUrl: null,
+        tags: ["SBA", "Business Plan", "Startup"],
+        sbaRelated: true
+      },
+      {
+        title: "Business Plan Templates",
+        description: "Collection of business plan templates and examples for different industries",
+        category: "Business Planning",
+        subcategory: "Templates",
+        source: "SCORE",
+        url: "https://www.score.org/resource/business-plan-template-startup-business",
+        fileUrl: null,
+        thumbnailUrl: null,
+        tags: ["Business Plan", "Template", "SCORE"],
+        sbaRelated: true
+      },
+      {
+        title: "VR Services for Self-Employment",
+        description: "Overview of Vocational Rehabilitation services and support for individuals pursuing self-employment",
+        category: "VR Resources",
+        subcategory: "Self-Employment",
+        source: "VR4Deaf",
+        url: null,
+        fileUrl: "/api/storage/file/VR-Providers-Handbook-2020.pdf",
+        thumbnailUrl: null,
+        tags: ["VR", "Self-Employment", "Funding"],
+        sbaRelated: false
+      },
+      {
+        title: "Tax Obligations for Self-Employed Individuals",
+        description: "Guide to understanding tax obligations, deductions, and filing requirements for self-employed entrepreneurs",
+        category: "Financial",
+        subcategory: "Taxes",
+        source: "IRS",
+        url: "https://www.irs.gov/businesses/small-businesses-self-employed",
+        fileUrl: null,
+        thumbnailUrl: null,
+        tags: ["Taxes", "Self-Employment", "IRS"],
+        sbaRelated: false
+      },
+      {
+        title: "Access to Capital for Deaf Entrepreneurs",
+        description: "Resources and funding opportunities specifically for deaf entrepreneurs",
+        category: "Financial",
+        subcategory: "Funding",
+        source: "Deaf Business Association",
+        url: "https://www.deafbusiness.org/resources",
+        fileUrl: null,
+        thumbnailUrl: null,
+        tags: ["Funding", "Loans", "Grants", "Deaf"],
+        sbaRelated: true
+      },
+      {
+        title: "Marketing Guide for Small Businesses",
+        description: "Effective marketing strategies and channels for small businesses with limited budgets",
+        category: "Marketing",
+        subcategory: "Strategy",
+        source: "Marketing Experts",
+        url: "https://www.marketingexperts.com/small-business",
+        fileUrl: null,
+        thumbnailUrl: null,
+        tags: ["Marketing", "Digital", "Strategy"],
+        sbaRelated: false
+      }
+    ];
+    
+    resources.forEach(resource => {
+      const id = this.resourceIdCounter++;
+      this.resources.set(id, { 
+        ...resource, 
+        id, 
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    });
   }
 }
 
