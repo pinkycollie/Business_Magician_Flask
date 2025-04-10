@@ -28,8 +28,6 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-// Import icons from lucide-react only
-// Removed SiFile as it doesn't exist
 import { Link } from 'wouter';
 import {
   FileText,
@@ -169,10 +167,12 @@ const ResourceLibrary = () => {
     }
     
     return true;
-  });
+  }) : [];
 
   // Get unique categories
-  const categories = [...new Set(resources?.map((r: Resource) => r.category) || [])];
+  const categories = Array.isArray(resources) ? 
+    [...new Set(resources.map((r: Resource) => r.category))] : 
+    [];
 
   return (
     <div className="w-full">
@@ -238,13 +238,13 @@ const ResourceLibrary = () => {
             <div className="text-center py-8 text-red-500">
               Error loading resources. Please try again.
             </div>
-          ) : filteredResources?.length === 0 ? (
+          ) : filteredResources.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No resources found matching your search criteria.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredResources?.map((resource: Resource) => (
+              {filteredResources.map((resource: Resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
             </div>
@@ -258,13 +258,13 @@ const ResourceLibrary = () => {
             <div className="text-center py-8 text-red-500">
               Error loading resources. Please try again.
             </div>
-          ) : filteredResources?.length === 0 ? (
+          ) : filteredResources.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No document resources found matching your search criteria.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredResources?.map((resource: Resource) => (
+              {filteredResources.map((resource: Resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
             </div>
@@ -278,13 +278,13 @@ const ResourceLibrary = () => {
             <div className="text-center py-8 text-red-500">
               Error loading resources. Please try again.
             </div>
-          ) : filteredResources?.length === 0 ? (
+          ) : filteredResources.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No web link resources found matching your search criteria.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredResources?.map((resource: Resource) => (
+              {filteredResources.map((resource: Resource) => (
                 <ResourceCard key={resource.id} resource={resource} />
               ))}
             </div>
