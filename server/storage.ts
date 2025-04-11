@@ -11,6 +11,7 @@ import {
   userCounselors, type UserCounselor, type InsertUserCounselor,
   resources, type Resource, type InsertResource
 } from "@shared/schema";
+import { DatabaseStorage } from './database';
 
 export interface IStorage {
   // User operations
@@ -713,15 +714,10 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import the DatabaseStorage when using the database 
-// Note: commented out until we fully migrate to database
-// import { DatabaseStorage } from './database';
+// Storage implementation
 
-// For now, use MemStorage by default to avoid issues
-// const USE_DATABASE = process.env.DATABASE_URL ? true : false;
+// Import DatabaseStorage for persistent storage
+import { DatabaseStorage } from './database';
 
-// Export the chosen storage implementation
-export const storage = new MemStorage();
-
-// When ready to use database:
-// export const storage = USE_DATABASE ? new DatabaseStorage() : new MemStorage();
+// Use DatabaseStorage for persistent storage with PostgreSQL
+export const storage = new DatabaseStorage();
