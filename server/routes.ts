@@ -17,19 +17,28 @@ import {
 import storageRoutes from "./routes/storage";
 import pipelineRoutes from "./routes/pipeline";
 import anthropicRoutes from "./routes/anthropic";
+import aiRoutes from "./routes/ai";
+import aiControllerRoutes from "./routes/ai-controller";
+import { initializeRealtimeTranslation } from "./services/realtimeTranslation";
 
 // Validation error handling
 import { fromZodError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Register storage routes
+  // Create HTTP server
+  const server = createServer(app);
+  
+  // Initialize WebSocket server for real-time translation
+  initializeRealtimeTranslation(server);
+  
+  // Register API routes
   app.use('/api/storage', storageRoutes);
-  
-  // Register pipeline routes
   app.use('/api/pipeline', pipelineRoutes);
+  app.use('/api/claude', anthropicRoutes);
+  app.use('/api/ai', aiRoutes);
   
-  // Register Anthropic Claude routes
-  app.use('/api/ai', anthropicRoutes);
+  // Register the new unified AI controller
+  app.use('/api/v1/ai', aiControllerRoutes);
 
   // Base API route
   app.get("/api/health", (_req, res) => {
