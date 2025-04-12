@@ -1,15 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { getAnthropicClient, checkAIServicesAvailability } from './aiLazyLoader';
 
 // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-// Configure Claude client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
 
-// Flag indicating if service is available
-export const hasAnthropicKey = (() => {
-  return !!process.env.ANTHROPIC_API_KEY;
-})();
+// Function to check if Anthropic service is available
+export const hasAnthropicKey = (): boolean => {
+  return checkAIServicesAvailability().anthropic;
+};
 
 // Generate business ideas using Claude
 export async function generateBusinessIdeas(
@@ -25,11 +21,14 @@ export async function generateBusinessIdeas(
     startupCosts: string;
   }>;
 }> {
-  if (!hasAnthropicKey) {
+  if (!hasAnthropicKey()) {
     throw new Error("Anthropic API key not configured");
   }
   
   try {
+    // Get Anthropic client using lazy loader
+    const anthropic = getAnthropicClient();
+    
     const prompt = `Generate 3 innovative business ideas for a deaf entrepreneur with the following interests: ${interests.join(
       ", "
     )}. ${marketInfo ? `Consider this market information: ${marketInfo}.` : ""} ${
@@ -84,11 +83,14 @@ export async function analyzeBusinessIdea(
   recommendations: string[];
   accessibilityConsiderations: string[];
 }> {
-  if (!hasAnthropicKey) {
+  if (!hasAnthropicKey()) {
     throw new Error("Anthropic API key not configured");
   }
   
   try {
+    // Get Anthropic client using lazy loader
+    const anthropic = getAnthropicClient();
+    
     const prompt = `Analyze this business idea for a deaf entrepreneur:
     
     Business Idea: ${ideaTitle}
@@ -136,11 +138,14 @@ export async function createBusinessPlanOutline(
     keyPoints: string[];
   }>;
 }> {
-  if (!hasAnthropicKey) {
+  if (!hasAnthropicKey()) {
     throw new Error("Anthropic API key not configured");
   }
   
   try {
+    // Get Anthropic client using lazy loader
+    const anthropic = getAnthropicClient();
+    
     const prompt = `Create a business plan outline for "${businessName}": ${businessDescription}. The target market is: ${targetMarket}.
     
     Generate an outline with the standard business plan sections, providing a brief description and 3-5 key points to address for each section.

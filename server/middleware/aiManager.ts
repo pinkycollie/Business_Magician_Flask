@@ -6,9 +6,8 @@
  * determines which models to use based on context, and provides fallbacks.
  */
 
-import OpenAI from 'openai';
-import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
+import { getOpenAIClient, getAnthropicClient } from '../services/aiLazyLoader';
 
 // Types of AI services available in the 360 Business Magician ecosystem
 export enum AIServiceType {
@@ -120,27 +119,48 @@ const environmentSettings = {
   }
 };
 
-// AI service clients
+// Type imports (only for type annotations, not for actual imports)
+import type OpenAI from 'openai';
+import type Anthropic from '@anthropic-ai/sdk';
+
+// AI service clients - will be initialized on demand
 let openaiClient: OpenAI | null = null;
 let anthropicClient: Anthropic | null = null;
 
-// Initialize clients
-export function initializeAIClients() {
-  // Initialize OpenAI if API key is available
-  if (process.env.OPENAI_API_KEY) {
-    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    console.log('OpenAI client initialized');
-  } else {
-    console.log('OpenAI client not initialized (API key missing)');
-  }
+// Check if keys are available
+const hasOpenAIKey = () => {
+  return !!(process.env.OPENAI_API_KEY || 
+         process.env.OPENAI_MANAGED_KEY || 
+         process.env.OPENAI_API_IDEA_KEY || 
+         process.env.OPENAI_API_BUILD_KEY || 
+         process.env.OPENAI_API_GROW_KEY);
+};
 
-  // Initialize Anthropic if API key is available
-  if (process.env.ANTHROPIC_API_KEY) {
-    anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    console.log('Anthropic client initialized');
-  } else {
-    console.log('Anthropic client not initialized (API key missing)');
+const hasAnthropicKey = () => {
+  return !!process.env.ANTHROPIC_API_KEY;
+};
+
+// Get OpenAI client (lazy loading)
+function getOrInitOpenAIClient() {
+  if (!openaiClient) {
+    openaiClient = getOpenAIClient();
   }
+  return openaiClient;
+}
+
+// Get Anthropic client (lazy loading)
+function getOrInitAnthropicClient() {
+  if (!anthropicClient) {
+    anthropicClient = getAnthropicClient();
+  }
+  return anthropicClient;
+}
+
+// Log AI service availability status
+export function logAIServicesStatus() {
+  console.log('AI services status:');
+  console.log(`- OpenAI: ${hasOpenAIKey() ? 'Available (key present)' : 'Not available (API key missing)'}`);
+  console.log(`- Anthropic: ${hasAnthropicKey() ? 'Available (key present)' : 'Not available (API key missing)'}`);
 }
 
 // Get current environment
@@ -165,11 +185,11 @@ export function isServiceAvailable(serviceType: AIServiceType): boolean {
   // Check if required provider is available
   const config = serviceConfigurations[serviceType];
   
-  if (config.preferredProvider === AIProvider.OPENAI && !openaiClient) {
+  if (config.preferredProvider === AIProvider.OPENAI && !hasOpenAIKey()) {
     return config.fallbackProvider !== AIProvider.OPENAI || settings.useFallbacks;
   }
   
-  if (config.preferredProvider === AIProvider.ANTHROPIC && !anthropicClient) {
+  if (config.preferredProvider === AIProvider.ANTHROPIC && !hasAnthropicKey()) {
     return config.fallbackProvider !== AIProvider.ANTHROPIC || settings.useFallbacks;
   }
   
@@ -190,8 +210,8 @@ export function getServicesInfo() {
     available,
     environment,
     providers: {
-      openai: !!openaiClient,
-      anthropic: !!anthropicClient,
+      openai: hasOpenAIKey(),
+      anthropic: hasAnthropicKey(),
       google: false, // Update when implemented
       internal: true
     }
@@ -276,7 +296,9 @@ export async function processBusineseAssistance(params: z.infer<typeof businessA
 
 // Implementation with Anthropic/Claude
 async function processWithAnthropic(params: z.infer<typeof businessAssistanceSchema>) {
-  if (!anthropicClient) throw new Error('Anthropic client not initialized');
+  // Get client using lazy loading
+  anthropicClient = getOrInitAnthropicClient();
+  if (!anthropicClient) throw new Error('Anthropic client not available');
   
   const systemPrompt = `You are 360 Business Magician, an expert business assistant for deaf entrepreneurs.
   Provide clear, concise, and actionable advice related to business formation, management, and growth.
@@ -323,7 +345,9 @@ async function processWithAnthropic(params: z.infer<typeof businessAssistanceSch
 
 // Implementation with OpenAI
 async function processWithOpenAI(params: z.infer<typeof businessAssistanceSchema>) {
-  if (!openaiClient) throw new Error('OpenAI client not initialized');
+  // Get client using lazy loading
+  openaiClient = getOrInitOpenAIClient();
+  if (!openaiClient) throw new Error('OpenAI client not available');
   
   const systemPrompt = `You are 360 Business Magician, an expert business assistant for deaf entrepreneurs.
   Provide clear, concise, and actionable advice related to business formation, management, and growth.
@@ -416,5 +440,5 @@ async function processWithInternalModel(params: z.infer<typeof businessAssistanc
   return { response: responseText };
 }
 
-// Initialize AI clients on module import
-initializeAIClients();
+// Log AI service availability at startup - doesn't initialize clients
+logAIServicesStatus();

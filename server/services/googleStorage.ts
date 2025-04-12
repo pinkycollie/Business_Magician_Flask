@@ -38,35 +38,50 @@ export interface UploadResult {
   category: FileCategory;
 }
 
-// Configure Google Cloud Storage
-let storage: Storage;
-let bucketName: string;
+// Configure Google Cloud Storage with lazy initialization
+let storage: Storage | null = null;
+let bucketName: string = '';
+let isInitialized = false;
 
-try {
-  // Initialize Cloud Storage
-  // Check if credentials file exists at service account path (for local development)
-  const serviceAccountPath = path.resolve(process.cwd(), 'server/config/serviceAccount.json');
-  
-  if (fs.existsSync(serviceAccountPath)) {
-    // Use service account file
-    storage = new Storage({
-      keyFilename: serviceAccountPath
-    });
-  } else if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
-    // Use credentials from environment variable
-    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
-    storage = new Storage({ credentials });
-  } else {
-    // Use application default credentials (works in GCP environment)
-    storage = new Storage();
+/**
+ * Lazy initialization of Google Cloud Storage client
+ * Only initializes when first needed, reducing startup memory usage
+ */
+function initializeStorage(): Storage {
+  if (storage && isInitialized) {
+    return storage;
   }
   
-  // Get bucket name from environment or use default
-  bucketName = process.env.GOOGLE_CLOUD_BUCKET || '360-business-magician-files';
+  try {
+    // Initialize Cloud Storage
+    // Check if credentials file exists at service account path (for local development)
+    const serviceAccountPath = path.resolve(process.cwd(), 'server/config/serviceAccount.json');
+    
+    if (fs.existsSync(serviceAccountPath)) {
+      // Use service account file
+      storage = new Storage({
+        keyFilename: serviceAccountPath
+      });
+    } else if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
+      // Use credentials from environment variable
+      const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
+      storage = new Storage({ credentials });
+    } else {
+      // Use application default credentials (works in GCP environment)
+      storage = new Storage();
+    }
+    
+    // Get bucket name from environment or use default
+    bucketName = process.env.GOOGLE_CLOUD_BUCKET || '360-business-magician-files';
+    
+    isInitialized = true;
+    console.log('Google Cloud Storage client initialized successfully');
+  } catch (error) {
+    console.error('Error initializing Google Cloud Storage:', error);
+    throw new Error('Failed to initialize Google Cloud Storage');
+  }
   
-  console.log('Google Cloud Storage client initialized successfully');
-} catch (error) {
-  console.error('Error initializing Google Cloud Storage:', error);
+  return storage;
 }
 
 /**
@@ -83,6 +98,9 @@ export async function uploadFile(
   category: FileCategory = FileCategory.OTHER
 ): Promise<UploadResult> {
   try {
+    // Ensure storage is initialized
+    const storageClient = initializeStorage();
+    
     // Generate a unique filename to prevent collisions
     const fileExtension = path.extname(file.originalname);
     const fileName = `${path.basename(file.originalname, fileExtension)}-${uuidv4().substring(0, 8)}${fileExtension}`;
@@ -91,7 +109,7 @@ export async function uploadFile(
     const filePath = `users/${userId}/${category}/${fileName}`;
     
     // Get bucket reference
-    const bucket = storage.bucket(bucketName);
+    const bucket = storageClient.bucket(bucketName);
     const fileRef = bucket.file(filePath);
     
     // Upload file
@@ -137,6 +155,9 @@ export async function listUserFiles(
   category?: FileCategory
 ): Promise<File[]> {
   try {
+    // Ensure storage is initialized
+    const storageClient = initializeStorage();
+    
     // Build prefix path based on parameters
     let prefix = `users/${userId}/`;
     if (category) {
@@ -144,7 +165,7 @@ export async function listUserFiles(
     }
     
     // Get bucket and list files with prefix
-    const bucket = storage.bucket(bucketName);
+    const bucket = storageClient.bucket(bucketName);
     const [files] = await bucket.getFiles({ prefix });
     
     // Build response structure
@@ -183,7 +204,10 @@ export async function listUserFiles(
  */
 export async function deleteFile(filePath: string): Promise<void> {
   try {
-    const bucket = storage.bucket(bucketName);
+    // Ensure storage is initialized
+    const storageClient = initializeStorage();
+    
+    const bucket = storageClient.bucket(bucketName);
     const file = bucket.file(filePath);
     
     // Check if file exists before attempting to delete
@@ -211,7 +235,10 @@ export async function getSignedUrl(
   expirationMinutes: number = 60
 ): Promise<string> {
   try {
-    const bucket = storage.bucket(bucketName);
+    // Ensure storage is initialized
+    const storageClient = initializeStorage();
+    
+    const bucket = storageClient.bucket(bucketName);
     const file = bucket.file(filePath);
     
     // Check if file exists before generating URL

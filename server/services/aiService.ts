@@ -12,16 +12,25 @@
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 
+// Get OpenAI API key from any available key
+const getOpenAIApiKey = () => {
+  return process.env.OPENAI_API_KEY || 
+         process.env.OPENAI_MANAGED_KEY || 
+         process.env.OPENAI_API_IDEA_KEY || 
+         process.env.OPENAI_API_BUILD_KEY || 
+         process.env.OPENAI_API_GROW_KEY;
+};
+
 // Service configurations
-const openai = process.env.OPENAI_API_KEY ? 
-  new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+const openai = getOpenAIApiKey() ? 
+  new OpenAI({ apiKey: getOpenAIApiKey() }) : null;
 
 const anthropic = process.env.ANTHROPIC_API_KEY ? 
   new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
 
 // Service availability flags
 export const availableServices = {
-  openai: !!process.env.OPENAI_API_KEY,
+  openai: !!getOpenAIApiKey(),
   anthropic: !!process.env.ANTHROPIC_API_KEY,
   googleAI: false, // Will be updated when implemented
 };

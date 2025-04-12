@@ -19,7 +19,7 @@ import pipelineRoutes from "./routes/pipeline";
 import anthropicRoutes from "./routes/anthropic";
 import aiRoutes from "./routes/ai";
 import aiControllerRoutes from "./routes/ai-controller";
-import wrapafaiWebhookRoutes from "./routes/wrapafai-webhook";
+import openaiTestRoute from "./routes/openai-test";
 import { initializeRealtimeTranslation } from "./services/realtimeTranslation";
 
 // Validation error handling
@@ -29,15 +29,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server
   const server = createServer(app);
   
-  // Initialize WebSocket server for real-time translation
-  initializeRealtimeTranslation(server);
+  // Skip real-time translation initialization for performance
+  // WebSocket server will be initialized when first accessed
+  console.log("WebSocket initialization deferred for better startup performance");
   
   // Register API routes
   app.use('/api/storage', storageRoutes);
   app.use('/api/pipeline', pipelineRoutes);
   app.use('/api/claude', anthropicRoutes);
   app.use('/api/ai', aiRoutes);
-  app.use('/api/webhooks/wrapafai', wrapafaiWebhookRoutes);
+  app.use('/api/openai-test', openaiTestRoute);
   
   // Register the new unified AI controller
   app.use('/api/v1/ai', aiControllerRoutes);

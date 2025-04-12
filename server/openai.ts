@@ -1,7 +1,6 @@
-import OpenAI from "openai";
+import { getOpenAIClient } from "./services/aiLazyLoader";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Generate business ideas using OpenAI
 export async function generateBusinessIdeas(
@@ -18,6 +17,9 @@ export async function generateBusinessIdeas(
   }>;
 }> {
   try {
+    // Get OpenAI client using lazy loader
+    const openai = getOpenAIClient();
+    
     const prompt = `Generate 3 innovative business ideas for a deaf entrepreneur with the following interests: ${interests.join(
       ", "
     )}. ${marketInfo ? `Consider this market information: ${marketInfo}.` : ""} ${
@@ -94,6 +96,9 @@ export async function analyzeBusinessIdea(
   recommendations: string[];
 }> {
   try {
+    // Get OpenAI client using lazy loader
+    const openai = getOpenAIClient();
+    
     const prompt = `Analyze the viability of this business idea: "${idea}" for the target market: "${targetMarket}". ${
       competitionInfo ? `Here's information about the competition: ${competitionInfo}.` : ""
     }

@@ -61,6 +61,11 @@ const Header: React.FC = () => {
                   Translation
                 </Link>
               </li>
+              <li>
+                <Link href="/business-tools" className="text-slate-600 hover:text-primary font-medium">
+                  Business Tools
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex items-center gap-2">

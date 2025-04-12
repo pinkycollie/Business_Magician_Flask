@@ -7,9 +7,10 @@ const router = Router();
 
 // Claude service status check
 router.get("/claude/status", (req, res) => {
+  const isAvailable = hasAnthropicKey();
   res.json({ 
-    available: hasAnthropicKey,
-    message: hasAnthropicKey ? 
+    available: isAvailable,
+    message: isAvailable ? 
       "Claude AI service is available" : 
       "Claude AI service requires API key configuration"
   });
@@ -26,7 +27,7 @@ router.post("/claude/generate-ideas", async (req, res) => {
     
     const data = schema.parse(req.body);
     
-    if (!hasAnthropicKey) {
+    if (!hasAnthropicKey()) {
       return res.status(400).json({ 
         error: "Claude API key is required for this feature",
         configureKey: true
@@ -74,7 +75,7 @@ router.post("/claude/analyze-idea", async (req, res) => {
     
     const data = schema.parse(req.body);
     
-    if (!hasAnthropicKey) {
+    if (!hasAnthropicKey()) {
       return res.status(400).json({ 
         error: "Claude API key is required for this feature",
         configureKey: true
@@ -121,7 +122,7 @@ router.post("/claude/create-business-plan", async (req, res) => {
     
     const data = schema.parse(req.body);
     
-    if (!hasAnthropicKey) {
+    if (!hasAnthropicKey()) {
       return res.status(400).json({ 
         error: "Claude API key is required for this feature",
         configureKey: true

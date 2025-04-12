@@ -38,11 +38,35 @@ interface TranslationSession {
 // Map to store active translation sessions
 const activeSessions = new Map<string, TranslationSession>();
 
+// Track if socket server has been initialized
+let isInitialized = false;
+let io: SocketIOServer | null = null;
+
 /**
  * Initialize real-time translation WebSocket server
+ * Uses lazy initialization to reduce memory usage during startup
  */
 export function initializeRealtimeTranslation(httpServer: HTTPServer): SocketIOServer {
-  const io = new SocketIOServer(httpServer);
+  // Don't initialize multiple times
+  if (isInitialized && io) {
+    console.log('Real-time translation WebSocket server already initialized');
+    return io;
+  }
+  
+  // Create socket server with optimized settings
+  io = new SocketIOServer(httpServer, {
+    // Optimize for memory usage
+    perMessageDeflate: {
+      threshold: 2048, // Only compress data larger than 2KB
+      zlibDeflateOptions: {
+        chunkSize: 8 * 1024 // 8KB chunks
+      }
+    },
+    // Disable automatic reconnection to reduce resource usage
+    connectTimeout: 10000,
+    pingTimeout: 5000
+  });
+  
   const translationNamespace = io.of('/translation');
   
   console.log('Real-time translation WebSocket server initialized');
