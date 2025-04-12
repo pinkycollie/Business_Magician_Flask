@@ -11,7 +11,7 @@ import {
   AIServiceType, 
   getServicesInfo, 
   processBusineseAssistance,
-  businessAssistanceSchema 
+  getBusinessAssistanceSchema
 } from '../middleware/aiManager';
 
 const router = Router();
@@ -25,6 +25,8 @@ router.get('/services', (req, res) => {
 // Business assistance endpoint
 router.post('/business-assistant', async (req, res) => {
   try {
+    // Use the lazy-loaded schema
+    const businessAssistanceSchema = getBusinessAssistanceSchema();
     const validatedData = businessAssistanceSchema.parse(req.body);
     
     try {

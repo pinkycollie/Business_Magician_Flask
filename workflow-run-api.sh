@@ -1,2 +1,5 @@
 #!/bin/bash
-npx tsx api-server.ts
+
+# This script runs the bare minimum server
+echo "Starting 360 Business Magician API server..."
+node --import tsx server/bare-minimum.ts

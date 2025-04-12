@@ -1,134 +1,169 @@
-// Simple API server to test core functionality
-import express from 'express';
-import cors from 'cors';
-const app = express();
+/**
+ * 360 Business Magician API Server
+ * Low-memory optimized version
+ */
 
-// Middleware
+import express from 'express';
+import { createServer } from 'http';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Check environment variables
+console.log('API Server starting...');
+console.log('AI services status:');
+console.log(`- OpenAI: ${process.env.OPENAI_API_KEY ? 'Available (key present)' : 'Not available'}`);
+console.log(`- Anthropic: ${process.env.ANTHROPIC_API_KEY ? 'Available (key present)' : 'Not available'}`);
+
+// Create Express application
+const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-// Service flags - these will be set based on environment variables 
-// and available services
-const serviceStatus = {
-  database: false,
-  googleCloud: false,
-  anthropic: false,
-  openai: false
-};
+// Simple request logger
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (req.path.startsWith("/api")) {
+      console.log(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
+    }
+  });
+  next();
+});
 
-// Initialize service status
-(function checkServices() {
-  try {
-    serviceStatus.database = !!process.env.DATABASE_URL;
-    serviceStatus.googleCloud = !!process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    serviceStatus.anthropic = !!process.env.ANTHROPIC_API_KEY;
-    serviceStatus.openai = !!process.env.OPENAI_API_KEY;
-    
-    console.log('Service status:', JSON.stringify(serviceStatus, null, 2));
-  } catch (error) {
-    console.error('Error checking services:', error);
-  }
-})();
+// API ENDPOINTS
+// Health check
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", mode: "api-server" });
+});
 
-// Status endpoint
-app.get('/api/status', (req, res) => {
+// AI services status 
+app.get("/api/ai-status", (_req, res) => {
   res.json({
-    status: 'running',
-    services: serviceStatus,
-    environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+    openai: !!process.env.OPENAI_API_KEY,
+    anthropic: !!process.env.ANTHROPIC_API_KEY,
+    environment: process.env.NODE_ENV || "development"
   });
 });
 
-// Basic business idea generator (without AI dependency)
+// Business tools endpoint
+app.get("/api/business-tools", (_req, res) => {
+  res.json({
+    tools: [
+      { 
+        id: "business-idea-generator",
+        name: "Business Idea Generator",
+        description: "Generate custom business ideas based on your interests and skills"
+      },
+      { 
+        id: "financial-calculator",
+        name: "Financial Calculator",
+        description: "Calculate startup costs and project financial needs"
+      },
+      { 
+        id: "market-analyzer",
+        name: "Market Analysis Tool",
+        description: "Research your target market and competition"
+      },
+      { 
+        id: "business-plan-writer",
+        name: "Business Plan Writer",
+        description: "Create a professional business plan with AI assistance"
+      },
+      {
+        id: "asl-business-guidance",
+        name: "ASL Business Guidance",
+        description: "Video resources explaining business concepts in American Sign Language"
+      }
+    ]
+  });
+});
+
+// Business Phases (lifecycle)
+app.get("/api/business-phases", (_req, res) => {
+  res.json({
+    phases: [
+      {
+        id: "idea",
+        name: "Idea Phase",
+        description: "Explore and validate business ideas"
+      },
+      {
+        id: "build",
+        name: "Build Phase",
+        description: "Create your business foundation and structure"
+      },
+      {
+        id: "grow",
+        name: "Grow Phase",
+        description: "Expand your customer base and operations"
+      },
+      {
+        id: "manage",
+        name: "Manage Phase",
+        description: "Optimize business operations and sustainability"
+      }
+    ]
+  });
+});
+
+// BUSINESS IDEA GENERATOR
 function generateBasicBusinessIdea(interests = ['technology'], marketInfo = 'general', constraints = []) {
-  const businessTypes = [
-    "e-commerce store", "consulting service", "mobile app", 
-    "subscription service", "online marketplace"
+  // Simple placeholder to generate ideas without AI integration
+  const ideaTemplates = [
+    { name: "Mobile App for Deaf Entrepreneurs", description: "A specialized mobile app that provides business guidance, resources and networking opportunities specifically designed for deaf entrepreneurs." },
+    { name: "ASL Business Training Platform", description: "Online platform offering business courses and certifications in American Sign Language." },
+    { name: "Accessibility Consulting Service", description: "Consulting service that helps businesses improve accessibility for deaf and hard-of-hearing customers and employees." },
+    { name: "Deaf-Friendly Co-working Space", description: "Co-working space designed with deaf entrepreneurs in mind, featuring visual alerts, specialized meeting rooms, and sign language interpreters." },
+    { name: "ASL Interpretation Booking Platform", description: "Platform connecting businesses with qualified ASL interpreters for meetings, events, and customer service." }
   ];
-  
-  // Select random business type and combine with user interests
-  const businessType = businessTypes[Math.floor(Math.random() * businessTypes.length)];
-  const primaryInterest = interests[0];
-  const secondaryInterest = interests.length > 1 ? interests[1] : interests[0];
-  
-  const ideas = [
-    {
-      title: `${primaryInterest.charAt(0).toUpperCase() + primaryInterest.slice(1)} ${businessType}`,
-      description: `A ${businessType} focused on ${primaryInterest} and ${secondaryInterest} for the ${marketInfo || 'general'} market.`,
-      marketPotential: ["High", "Medium", "Low"][Math.floor(Math.random() * 3)],
-      difficultyLevel: ["High", "Medium", "Low"][Math.floor(Math.random() * 3)],
-      startupCosts: `$${Math.floor(Math.random() * 10) + 1}k - $${Math.floor(Math.random() * 20) + 10}k`,
-      notes: `Consider focusing on accessibility features for deaf entrepreneurs.`
-    },
-    {
-      title: `Accessible ${secondaryInterest} platform`,
-      description: `An accessible platform designed for the ${primaryInterest} community, focusing on ${secondaryInterest}.`,
-      marketPotential: ["High", "Medium", "Low"][Math.floor(Math.random() * 3)],
-      difficultyLevel: ["High", "Medium", "Low"][Math.floor(Math.random() * 3)],
-      startupCosts: `$${Math.floor(Math.random() * 15) + 5}k - $${Math.floor(Math.random() * 25) + 15}k`,
-      notes: `Integrate ASL video support throughout the user experience.`
-    }
-  ];
-  
+
+  // Select random idea from templates as a placeholder
+  const randomIndex = Math.floor(Math.random() * ideaTemplates.length);
   return {
-    ideas,
-    generatedWith: "local-generator",
-    interestsUsed: interests,
-    timestamp: new Date().toISOString()
+    ...ideaTemplates[randomIndex],
+    generatedAt: new Date().toISOString(),
+    interests: interests,
+    viabilityScore: Math.floor(Math.random() * 100),
+    implementationComplexity: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)]
   };
 }
 
-// Business idea routes
-app.post('/api/generate-ideas', (req, res) => {
-  try {
-    const { interests = ['technology'], marketInfo, constraints } = req.body;
-    const result = generateBasicBusinessIdea(interests, marketInfo, constraints);
-    res.json(result);
-  } catch (error) {
-    console.error('Error generating ideas:', error);
-    res.status(500).json({ error: 'Failed to generate business ideas', message: error.message });
-  }
+// Business idea generation endpoint
+app.post("/api/generate-business-idea", (req, res) => {
+  const { interests, marketInfo, constraints } = req.body;
+  const idea = generateBasicBusinessIdea(
+    interests || ['technology'], 
+    marketInfo || 'general', 
+    constraints || []
+  );
+  
+  res.json({ success: true, idea });
 });
 
-// ASL video routes
-const aslVideos = [
-  { id: 1, title: 'Business Formation Introduction', url: '/videos/business-formation.mp4', phaseId: 1 },
-  { id: 2, title: 'Market Research Basics', url: '/videos/market-research.mp4', phaseId: 1 },
-  { id: 3, title: 'Financial Planning', url: '/videos/financial-planning.mp4', phaseId: 2 }
-];
+// Static file serving - client application
+app.use(express.static(path.join(__dirname, 'client/dist')));
 
-app.get('/api/asl-videos', (req, res) => {
-  const { phaseId } = req.query;
-  if (phaseId) {
-    res.json(aslVideos.filter(video => video.phaseId === parseInt(phaseId)));
-  } else {
-    res.json(aslVideos);
-  }
-});
-
-// Lifecycle phases routes
-const lifecyclePhases = [
-  { id: 1, name: "Idea", slug: "idea", description: "Generate and validate business ideas", order: 1 },
-  { id: 2, name: "Build", slug: "build", description: "Develop your business foundation", order: 2 },
-  { id: 3, name: "Grow", slug: "grow", description: "Expand your business reach", order: 3 },
-  { id: 4, name: "Manage", slug: "manage", description: "Optimize and maintain your business", order: 4 }
-];
-
-app.get('/api/lifecycle-phases', (req, res) => {
-  res.json(lifecyclePhases);
-});
-
-app.get('/api/lifecycle-phases/:slug', (req, res) => {
-  const phase = lifecyclePhases.find(p => p.slug === req.params.slug);
-  if (!phase) {
-    return res.status(404).json({ error: 'Phase not found' });
-  }
-  res.json(phase);
+// SPA fallback
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`API server running at http://0.0.0.0:${PORT}`);
+const port = process.env.PORT || 5000;
+const server = createServer(app);
+
+server.listen({
+  port,
+  host: "0.0.0.0",
+}, () => {
+  console.log(`360 Business Magician API Server running on port ${port}`);
 });
+
+export default app;

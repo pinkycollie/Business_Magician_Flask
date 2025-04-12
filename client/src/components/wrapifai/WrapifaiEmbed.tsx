@@ -1,56 +1,32 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface WrapifaiEmbedProps {
   embedId: string;
   height?: string;
-  width?: string;
   className?: string;
 }
 
 /**
- * WRAPIFAI Tool Generator Embed Component
- * 
- * This component embeds a WRAPIFAI tool generator into any page
- * using their official embed code structure.
+ * Empty implementation of WrapifaiEmbed component
+ * This is a placeholder to maintain compatibility with existing imports
+ * while removing the actual WRAPIFAI integration
  */
-export function WrapifaiEmbed({ 
-  embedId, 
-  height = '600px', 
-  width = '100%',
-  className = '' 
-}: WrapifaiEmbedProps) {
-  
-  useEffect(() => {
-    // Load the WRAPIFAI embed script
-    const script = document.createElement('script');
-    script.src = 'https://app.wrapifai.com/embed/index.js';
-    script.async = true;
-    
-    // Add script to document
-    document.body.appendChild(script);
-    
-    // Cleanup function
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-  
+export const WrapifaiEmbed: React.FC<WrapifaiEmbedProps> = ({ 
+  height = '600px',
+  className = '',
+}) => {
   return (
-    <div className={`wrapifai-embed-container ${className}`}>
-      <iframe
-        id="wrapifai-iframe"
-        src={`https://app.wrapifai.com/embed/${embedId}`}
-        width={width}
-        height={height}
-        frameBorder="0"
-        title="WRAPIFAI Tool Generator"
-        loading="lazy"
-        className="rounded-lg shadow-lg"
-      />
+    <div 
+      style={{ height }}
+      className={`bg-muted flex items-center justify-center rounded-lg ${className}`}
+    >
+      <div className="text-center p-6">
+        <h3 className="text-lg font-medium mb-2">AI Tool Generator</h3>
+        <p className="text-muted-foreground">
+          The external tool integration has been removed for performance reasons.
+          Please use the built-in business tools instead.
+        </p>
+      </div>
     </div>
   );
-}
-
-export default WrapifaiEmbed;
+};
