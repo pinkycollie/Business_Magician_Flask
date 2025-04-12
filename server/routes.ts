@@ -15,6 +15,8 @@ import {
   insertResourceSchema
 } from "@shared/schema";
 import storageRoutes from "./routes/storage";
+import pipelineRoutes from "./routes/pipeline";
+import anthropicRoutes from "./routes/anthropic";
 
 // Validation error handling
 import { fromZodError } from "zod-validation-error";
@@ -22,6 +24,12 @@ import { fromZodError } from "zod-validation-error";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register storage routes
   app.use('/api/storage', storageRoutes);
+  
+  // Register pipeline routes
+  app.use('/api/pipeline', pipelineRoutes);
+  
+  // Register Anthropic Claude routes
+  app.use('/api/ai', anthropicRoutes);
 
   // Base API route
   app.get("/api/health", (_req, res) => {
@@ -304,6 +312,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to generate business ideas without requiring AI services
+  const generateBasicBusinessIdea = (
+    interests: string[],
+    marketInfo?: string,
+    constraints?: string[]
+  ) => {
+    // Basic business templates
+    const businessTypes = [
+      "e-commerce store",
+      "consulting service",
+      "mobile app",
+      "subscription service",
+      "online marketplace"
+    ];
+    
+    // Select random business type
+    const businessType = businessTypes[Math.floor(Math.random() * businessTypes.length)];
+    
+    // Combine with user interests
+    const primaryInterest = interests[0];
+    const secondaryInterest = interests.length > 1 ? interests[1] : interests[0];
+    
+    const ideas = [
+      {
+        title: `${primaryInterest.charAt(0).toUpperCase() + primaryInterest.slice(1)} ${businessType}`,
+        description: `A ${businessType} focused on ${primaryInterest} and ${secondaryInterest} for the ${marketInfo || 'general'} market.`,
+        potentialScore: Math.floor(Math.random() * 5) + 5,
+        complexity: Math.floor(Math.random() * 3) + 3,
+        notes: `Consider focusing on accessibility features for deaf entrepreneurs.`
+      },
+      {
+        title: `Accessible ${secondaryInterest} platform`,
+        description: `An accessible platform designed for the ${primaryInterest} community, focusing on ${secondaryInterest}.`,
+        potentialScore: Math.floor(Math.random() * 4) + 6,
+        complexity: Math.floor(Math.random() * 4) + 4,
+        notes: `Integrate ASL video support throughout the user experience.`
+      }
+    ];
+    
+    return {
+      ideas,
+      generatedWith: "local-rules",
+      interestsUsed: interests,
+      timestamp: new Date().toISOString()
+    };
+  };
+
   // AI-powered business idea generation route
   app.post("/api/tools/generate-ideas", async (req, res) => {
     try {
@@ -315,26 +370,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const data = schema.parse(req.body);
       
-      // Check if OpenAI API key is available
-      if (!process.env.OPENAI_API_KEY) {
-        return res.status(503).json({ 
-          error: "OpenAI API key is not configured. Please contact the administrator.",
-          missingApiKey: true 
-        });
-      }
-      
       try {
-        // Import is done inside try block to handle possible module loading errors
-        const { generateBusinessIdeas } = await import('./openai');
-        const result = await generateBusinessIdeas(
-          data.interests,
-          data.marketInfo,
-          data.constraints
-        );
-        
-        res.json(result);
+        // Simplified business idea generation using rules-based approach
+        // This would be replaced with more sophisticated Google Cloud AI in production
+        const idea = generateBasicBusinessIdea(data.interests, data.marketInfo, data.constraints);
+        res.json(idea);
       } catch (aiError: any) {
-        console.error("OpenAI API error:", aiError);
+        console.error("Business idea generation error:", aiError);
         res.status(500).json({ 
           error: "Failed to generate business ideas. Please try again later.",
           message: aiError.message

@@ -51,6 +51,11 @@ const Header: React.FC = () => {
                   Resources
                 </Link>
               </li>
+              <li>
+                <Link href="/startup-pipeline" className="text-slate-600 hover:text-primary font-medium">
+                  Startup Pipeline
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex items-center gap-2">
