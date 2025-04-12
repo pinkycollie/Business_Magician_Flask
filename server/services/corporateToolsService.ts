@@ -3,49 +3,59 @@
  * 
  * This service handles authentication and communication with the Corporate Tools API
  * for business formation and document services.
+ * 
+ * Based on the documentation at docs.corporatetools.com
  */
 
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { z } from 'zod';
 
-// API configuration
-// In production, these would be stored in environment variables
+// API configuration based on Corporate Tools documentation
 const API_CONFIG = {
-  baseUrl: 'https://api.corporatetools.com/v2',
-  clientId: process.env.CORPORATE_TOOLS_CLIENT_ID,
-  clientSecret: process.env.CORPORATE_TOOLS_CLIENT_SECRET,
+  baseUrl: 'https://api.corporatetools.com',
   apiKey: process.env.CORPORATE_TOOLS_API_KEY,
+  apiSecret: process.env.CORPORATE_TOOLS_API_SECRET,
   tokenExpiration: '1h'
 };
 
 // Zod schema for API responses
 const ApiResponseSchema = z.object({
-  status: z.string(),
+  status: z.string().optional(),
+  success: z.boolean().optional(),
   message: z.string().optional(),
   data: z.unknown().optional(),
-  error: z.string().optional()
+  error: z.string().optional(),
+  errors: z.array(z.string()).optional()
 });
 
 /**
- * Generates a JWT token for API authentication
+ * Generates a JWT token for Corporate Tools API authentication
+ * Based on the JWT documentation at docs.corporatetools.com
  */
 function generateToken() {
-  if (!API_CONFIG.clientId || !API_CONFIG.clientSecret || !API_CONFIG.apiKey) {
+  if (!API_CONFIG.apiKey || !API_CONFIG.apiSecret) {
     throw new Error('Corporate Tools API credentials are not configured.');
   }
   
+  const now = Math.floor(Date.now() / 1000);
+  
   const payload = {
-    iss: API_CONFIG.clientId,
-    api_key: API_CONFIG.apiKey,
-    iat: Math.floor(Date.now() / 1000)
+    // Standard JWT claims
+    iss: 'business-magician-platform',  // Issuer - our application
+    sub: API_CONFIG.apiKey,             // Subject - API key
+    iat: now,                           // Issued at
+    exp: now + 3600,                    // Expires in 1 hour
+    
+    // Custom claims for Corporate Tools
+    api_key: API_CONFIG.apiKey
   };
   
-  return jwt.sign(payload, API_CONFIG.clientSecret, { expiresIn: API_CONFIG.tokenExpiration });
+  return jwt.sign(payload, API_CONFIG.apiSecret, { algorithm: 'HS256' });
 }
 
 /**
- * Creates an authenticated API client
+ * Creates an authenticated API client for Corporate Tools
  */
 function createApiClient() {
   const token = generateToken();
@@ -70,8 +80,12 @@ export async function getEntityTypes(stateCode: string) {
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to retrieve entity types');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve entity types';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
@@ -91,13 +105,42 @@ export async function getFilingRequirements(stateCode: string, entityType: strin
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to retrieve filing requirements');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve filing requirements';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
   } catch (error) {
     console.error('Error fetching filing requirements:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get filing fees for a specific state and entity type
+ */
+export async function getFilingFees(stateCode: string, entityType: string) {
+  try {
+    const client = createApiClient();
+    const response = await client.get(`/states/${stateCode}/fees/${entityType}`);
+    
+    const validatedResponse = ApiResponseSchema.parse(response.data);
+    
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve filing fees';
+      throw new Error(errorMsg);
+    }
+    
+    return validatedResponse.data;
+  } catch (error) {
+    console.error('Error fetching filing fees:', error);
     throw error;
   }
 }
@@ -112,8 +155,12 @@ export async function submitBusinessFormation(formData: any) {
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to submit business formation');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to submit business formation';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
@@ -133,8 +180,12 @@ export async function getFormationStatus(formationId: string) {
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to retrieve formation status');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve formation status';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
@@ -150,12 +201,18 @@ export async function getFormationStatus(formationId: string) {
 export async function getDocumentTemplates(stateCode: string, entityType: string) {
   try {
     const client = createApiClient();
-    const response = await client.get(`/documents/templates?state=${stateCode}&entity_type=${entityType}`);
+    const response = await client.get(`/documents/templates`, {
+      params: { state: stateCode, entity_type: entityType }
+    });
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to retrieve document templates');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve document templates';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
@@ -175,8 +232,12 @@ export async function generateDocument(templateId: string, documentData: any) {
     
     const validatedResponse = ApiResponseSchema.parse(response.data);
     
-    if (validatedResponse.status !== 'success') {
-      throw new Error(validatedResponse.error || validatedResponse.message || 'Failed to generate document');
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to generate document';
+      throw new Error(errorMsg);
     }
     
     return validatedResponse.data;
@@ -187,8 +248,33 @@ export async function generateDocument(templateId: string, documentData: any) {
 }
 
 /**
+ * Get registered agent services available
+ */
+export async function getRegisteredAgentServices() {
+  try {
+    const client = createApiClient();
+    const response = await client.get('/registered-agent/services');
+    
+    const validatedResponse = ApiResponseSchema.parse(response.data);
+    
+    if (validatedResponse.status === 'error' || validatedResponse.success === false) {
+      const errorMsg = validatedResponse.error || 
+                      (validatedResponse.errors && validatedResponse.errors.join(', ')) || 
+                      validatedResponse.message || 
+                      'Failed to retrieve registered agent services';
+      throw new Error(errorMsg);
+    }
+    
+    return validatedResponse.data;
+  } catch (error) {
+    console.error('Error fetching registered agent services:', error);
+    throw error;
+  }
+}
+
+/**
  * Check if API credentials are properly configured
  */
 export function isApiConfigured() {
-  return !!(API_CONFIG.clientId && API_CONFIG.clientSecret && API_CONFIG.apiKey);
+  return !!(API_CONFIG.apiKey && API_CONFIG.apiSecret);
 }

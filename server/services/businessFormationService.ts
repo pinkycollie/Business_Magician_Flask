@@ -151,11 +151,48 @@ export async function getNorthwestRegisteredAgentServices() {
   }
 }
 
-// These functions can be expanded in the future to support Corporate Tools API integration
-// For now, they're placeholders that will indicate Corporate Tools integration is not yet available
+// Corporate Tools Integration
+// Based on the documentation at docs.corporatetools.com
+
+import * as corporateToolsService from './corporateToolsService';
 
 export function isCorporateToolsConfigured() {
-  return false; // Not yet configured
+  return corporateToolsService.isApiConfigured();
+}
+
+// These functions provide a unified interface to Corporate Tools API
+// They simply delegate to the appropriate service
+
+export async function getCorporateToolsEntityTypes(stateCode: string) {
+  return corporateToolsService.getEntityTypes(stateCode);
+}
+
+export async function getCorporateToolsFilingRequirements(stateCode: string, entityType: string) {
+  return corporateToolsService.getFilingRequirements(stateCode, entityType);
+}
+
+export async function getCorporateToolsFilingFees(stateCode: string, entityType: string) {
+  return corporateToolsService.getFilingFees(stateCode, entityType);
+}
+
+export async function submitCorporateToolsBusinessFormation(formData: any) {
+  return corporateToolsService.submitBusinessFormation(formData);
+}
+
+export async function getCorporateToolsFormationStatus(formationId: string) {
+  return corporateToolsService.getFormationStatus(formationId);
+}
+
+export async function getCorporateToolsDocumentTemplates(stateCode: string, entityType: string) {
+  return corporateToolsService.getDocumentTemplates(stateCode, entityType);
+}
+
+export async function generateCorporateToolsDocument(templateId: string, documentData: any) {
+  return corporateToolsService.generateDocument(templateId, documentData);
+}
+
+export async function getCorporateToolsRegisteredAgentServices() {
+  return corporateToolsService.getRegisteredAgentServices();
 }
 
 export async function getAvailableProviders() {
