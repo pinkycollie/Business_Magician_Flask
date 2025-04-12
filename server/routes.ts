@@ -19,6 +19,7 @@ import pipelineRoutes from "./routes/pipeline";
 import anthropicRoutes from "./routes/anthropic";
 import aiRoutes from "./routes/ai";
 import aiControllerRoutes from "./routes/ai-controller";
+import wrapafaiWebhookRoutes from "./routes/wrapafai-webhook";
 import { initializeRealtimeTranslation } from "./services/realtimeTranslation";
 
 // Validation error handling
@@ -36,6 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/pipeline', pipelineRoutes);
   app.use('/api/claude', anthropicRoutes);
   app.use('/api/ai', aiRoutes);
+  app.use('/api/webhooks/wrapafai', wrapafaiWebhookRoutes);
   
   // Register the new unified AI controller
   app.use('/api/v1/ai', aiControllerRoutes);
