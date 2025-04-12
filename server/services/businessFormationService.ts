@@ -1,428 +1,181 @@
 /**
  * Business Formation Service
  * 
- * This service handles communication with various business formation API providers
- * including Corporate Tools, Northwest Registered Agent, and ZenBusiness.
+ * This service provides a unified interface for business formation services
+ * across different providers including Northwest Registered Agent and Corporate Tools.
  */
 
-import fetch from 'node-fetch';
-import { storage } from '../storage';
+import axios from 'axios';
+import { z } from 'zod';
 
-// Environment variables for API keys
-const CORPORATE_TOOLS_API_KEY = process.env.CORPORATE_TOOLS_API_KEY || '';
-const NORTHWEST_API_KEY = process.env.NORTHWEST_API_KEY || '';
-const ZENBUSINESS_API_KEY = process.env.ZENBUSINESS_API_KEY || '';
+// Northwest API Configuration
+const NORTHWEST_API_CONFIG = {
+  baseUrl: 'https://api.northwestregisteredagent.com/v1',
+  apiKey: process.env.NORTHWEST_API_KEY
+};
 
-// API Base URLs
-const CORPORATE_TOOLS_API_URL = 'https://api.corporatetools.com';
-const NORTHWEST_API_URL = 'https://api.northwestregisteredagent.com';
-const ZENBUSINESS_API_URL = 'https://api.zenbusiness.com/v1';
+// API Response Schema for Northwest
+const NorthwestApiResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string().optional(),
+  data: z.unknown().optional()
+});
 
 /**
- * Validate that we have API keys for the different providers
+ * Creates a Northwest API client with the API key in headers
  */
-export function getAvailableProviders() {
-  const availableProviders = [];
-  
-  if (CORPORATE_TOOLS_API_KEY) {
-    availableProviders.push('corporatetools');
+function createNorthwestClient() {
+  if (!NORTHWEST_API_CONFIG.apiKey) {
+    throw new Error('Northwest Registered Agent API key is not configured.');
   }
   
-  if (NORTHWEST_API_KEY) {
-    availableProviders.push('northwest');
-  }
-  
-  if (ZENBUSINESS_API_KEY) {
-    availableProviders.push('zenbusiness');
-  }
-  
-  return availableProviders;
+  return axios.create({
+    baseURL: NORTHWEST_API_CONFIG.baseUrl,
+    headers: {
+      'X-API-Key': NORTHWEST_API_CONFIG.apiKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
 }
 
 /**
- * Process a business formation request for Corporate Tools API
+ * Check if Northwest API is configured
  */
-export async function processCorporateToolsFormation(formationData: any) {
-  if (!CORPORATE_TOOLS_API_KEY) {
-    throw new Error('Corporate Tools API key is not configured');
-  }
-  
+export function isNorthwestConfigured() {
+  return !!NORTHWEST_API_CONFIG.apiKey;
+}
+
+/**
+ * Get available entity types for a specific state from Northwest
+ */
+export async function getNorthwestEntityTypes(stateCode: string) {
   try {
-    // Make API request to Corporate Tools
-    const response = await fetch(`${CORPORATE_TOOLS_API_URL}/formations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CORPORATE_TOOLS_API_KEY}`
-      },
-      body: JSON.stringify(formationData)
-    });
+    const client = createNorthwestClient();
+    const response = await client.get(`/entity-types/${stateCode}`);
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Corporate Tools API Error: ${errorData.message || response.statusText}`);
+    const validatedResponse = NorthwestApiResponseSchema.parse(response.data);
+    
+    if (!validatedResponse.success) {
+      throw new Error(validatedResponse.message || 'Failed to retrieve entity types');
     }
     
-    const formationResponse = await response.json();
-    
-    // Store the formation record in our database
-    await storeFormationRecord({
-      provider: 'corporatetools',
-      providerOrderId: formationResponse.id,
-      businessName: formationData.businessName,
-      entityType: formationData.businessType,
-      state: formationData.state,
-      status: formationResponse.status,
-      estimatedCompletionDate: formationResponse.estimatedCompletionDate,
-      userId: formationData.userId,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    
-    return formationResponse;
+    return validatedResponse.data;
   } catch (error) {
-    console.error('Error processing Corporate Tools formation:', error);
+    console.error('Error fetching Northwest entity types:', error);
     throw error;
   }
 }
 
 /**
- * Process a business formation request for Northwest Registered Agent API
+ * Get state filing fees and requirements from Northwest
  */
-export async function processNorthwestFormation(formationData: any) {
-  if (!NORTHWEST_API_KEY) {
-    throw new Error('Northwest API key is not configured');
-  }
-  
+export async function getNorthwestStateRequirements(stateCode: string) {
   try {
-    // Make API request to Northwest
-    const response = await fetch(`${NORTHWEST_API_URL}/api/formations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': NORTHWEST_API_KEY
-      },
-      body: JSON.stringify(formationData)
-    });
+    const client = createNorthwestClient();
+    const response = await client.get(`/states/${stateCode}/requirements`);
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Northwest API Error: ${errorData.message || response.statusText}`);
+    const validatedResponse = NorthwestApiResponseSchema.parse(response.data);
+    
+    if (!validatedResponse.success) {
+      throw new Error(validatedResponse.message || 'Failed to retrieve state requirements');
     }
     
-    const formationResponse = await response.json();
-    
-    // Store the formation record in our database
-    await storeFormationRecord({
-      provider: 'northwest',
-      providerOrderId: formationResponse.orderId,
-      businessName: formationData.companyName,
-      entityType: formationData.entityType,
-      state: formationData.state,
-      status: mapNorthwestStatus(formationResponse.status),
-      estimatedCompletionDate: formationResponse.trackingDetails.estimatedCompletionDate,
-      userId: formationData.userId,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    
-    return formationResponse;
+    return validatedResponse.data;
   } catch (error) {
-    console.error('Error processing Northwest formation:', error);
+    console.error('Error fetching Northwest state requirements:', error);
     throw error;
   }
 }
 
 /**
- * Process a business formation request for ZenBusiness API
+ * Submit a business formation order to Northwest
  */
-export async function processZenBusinessFormation(formationData: any) {
-  if (!ZENBUSINESS_API_KEY) {
-    throw new Error('ZenBusiness API key is not configured');
-  }
-  
+export async function submitNorthwestBusinessFormation(formData: any) {
   try {
-    // Make API request to ZenBusiness
-    const response = await fetch(`${ZENBUSINESS_API_URL}/formations`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ZENBUSINESS_API_KEY}`
-      },
-      body: JSON.stringify(formationData)
-    });
+    const client = createNorthwestClient();
+    const response = await client.post('/formations', formData);
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`ZenBusiness API Error: ${errorData.message || response.statusText}`);
+    const validatedResponse = NorthwestApiResponseSchema.parse(response.data);
+    
+    if (!validatedResponse.success) {
+      throw new Error(validatedResponse.message || 'Failed to submit business formation');
     }
     
-    const formationResponse = await response.json();
-    
-    // Store the formation record in our database
-    await storeFormationRecord({
-      provider: 'zenbusiness',
-      providerOrderId: formationResponse.formationId,
-      businessName: formationData.businessName,
-      entityType: formationData.entityType,
-      state: formationData.state,
-      status: formationResponse.status,
-      estimatedCompletionDate: formationResponse.estimatedCompletionDate,
-      userId: formationData.userId,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    
-    return formationResponse;
+    return validatedResponse.data;
   } catch (error) {
-    console.error('Error processing ZenBusiness formation:', error);
+    console.error('Error submitting Northwest business formation:', error);
     throw error;
   }
 }
 
 /**
- * Check the status of a formation request
+ * Check the status of a Northwest formation order
  */
-export async function checkFormationStatus(provider: string, orderId: string) {
-  switch (provider) {
-    case 'corporatetools':
-      return await checkCorporateToolsStatus(orderId);
-    case 'northwest':
-      return await checkNorthwestStatus(orderId);
-    case 'zenbusiness':
-      return await checkZenBusinessStatus(orderId);
-    default:
-      throw new Error(`Unsupported provider: ${provider}`);
-  }
-}
-
-/**
- * Check formation status with Corporate Tools
- */
-async function checkCorporateToolsStatus(orderId: string) {
-  if (!CORPORATE_TOOLS_API_KEY) {
-    throw new Error('Corporate Tools API key is not configured');
-  }
-  
+export async function getNorthwestFormationStatus(formationId: string) {
   try {
-    const response = await fetch(`${CORPORATE_TOOLS_API_URL}/formations/${orderId}`, {
-      headers: {
-        'Authorization': `Bearer ${CORPORATE_TOOLS_API_KEY}`
-      }
-    });
+    const client = createNorthwestClient();
+    const response = await client.get(`/formations/${formationId}/status`);
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Corporate Tools API Error: ${errorData.message || response.statusText}`);
+    const validatedResponse = NorthwestApiResponseSchema.parse(response.data);
+    
+    if (!validatedResponse.success) {
+      throw new Error(validatedResponse.message || 'Failed to retrieve formation status');
     }
     
-    const status = await response.json();
-    
-    // Update status in our database
-    await updateFormationStatus('corporatetools', orderId, status.status);
-    
-    return status;
+    return validatedResponse.data;
   } catch (error) {
-    console.error('Error checking Corporate Tools status:', error);
+    console.error('Error fetching Northwest formation status:', error);
     throw error;
   }
 }
 
 /**
- * Check formation status with Northwest
+ * Get available registered agent services from Northwest
  */
-async function checkNorthwestStatus(orderId: string) {
-  if (!NORTHWEST_API_KEY) {
-    throw new Error('Northwest API key is not configured');
-  }
-  
+export async function getNorthwestRegisteredAgentServices() {
   try {
-    const response = await fetch(`${NORTHWEST_API_URL}/api/formations/${orderId}`, {
-      headers: {
-        'X-API-Key': NORTHWEST_API_KEY
-      }
-    });
+    const client = createNorthwestClient();
+    const response = await client.get('/registered-agent/services');
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Northwest API Error: ${errorData.message || response.statusText}`);
+    const validatedResponse = NorthwestApiResponseSchema.parse(response.data);
+    
+    if (!validatedResponse.success) {
+      throw new Error(validatedResponse.message || 'Failed to retrieve registered agent services');
     }
     
-    const status = await response.json();
-    
-    // Update status in our database
-    await updateFormationStatus('northwest', orderId, mapNorthwestStatus(status.status));
-    
-    return status;
+    return validatedResponse.data;
   } catch (error) {
-    console.error('Error checking Northwest status:', error);
+    console.error('Error fetching Northwest registered agent services:', error);
     throw error;
   }
 }
 
-/**
- * Check formation status with ZenBusiness
- */
-async function checkZenBusinessStatus(orderId: string) {
-  if (!ZENBUSINESS_API_KEY) {
-    throw new Error('ZenBusiness API key is not configured');
+// These functions can be expanded in the future to support Corporate Tools API integration
+// For now, they're placeholders that will indicate Corporate Tools integration is not yet available
+
+export function isCorporateToolsConfigured() {
+  return false; // Not yet configured
+}
+
+export async function getAvailableProviders() {
+  const providers = [];
+  
+  if (isNorthwestConfigured()) {
+    providers.push({
+      id: 'northwest',
+      name: 'Northwest Registered Agent',
+      features: ['Business Formation', 'Registered Agent Services', 'Annual Reports']
+    });
   }
   
-  try {
-    const response = await fetch(`${ZENBUSINESS_API_URL}/formations/${orderId}`, {
-      headers: {
-        'Authorization': `Bearer ${ZENBUSINESS_API_KEY}`
-      }
+  if (isCorporateToolsConfigured()) {
+    providers.push({
+      id: 'corporate-tools',
+      name: 'Corporate Tools',
+      features: ['Business Formation', 'Document Generation', 'Compliance']
     });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`ZenBusiness API Error: ${errorData.message || response.statusText}`);
-    }
-    
-    const status = await response.json();
-    
-    // Update status in our database
-    await updateFormationStatus('zenbusiness', orderId, status.status);
-    
-    return status;
-  } catch (error) {
-    console.error('Error checking ZenBusiness status:', error);
-    throw error;
-  }
-}
-
-/**
- * Retrieve information about available states from Corporate Tools
- */
-export async function getAvailableStates() {
-  if (!CORPORATE_TOOLS_API_KEY) {
-    throw new Error('Corporate Tools API key is not configured');
   }
   
-  try {
-    const response = await fetch(`${CORPORATE_TOOLS_API_URL}/states`, {
-      headers: {
-        'Authorization': `Bearer ${CORPORATE_TOOLS_API_KEY}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Corporate Tools API Error: ${errorData.message || response.statusText}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching available states:', error);
-    throw error;
-  }
-}
-
-/**
- * Retrieve information about a specific state from Corporate Tools
- */
-export async function getStateInfo(stateCode: string) {
-  if (!CORPORATE_TOOLS_API_KEY) {
-    throw new Error('Corporate Tools API key is not configured');
-  }
-  
-  try {
-    const response = await fetch(`${CORPORATE_TOOLS_API_URL}/states/${stateCode}`, {
-      headers: {
-        'Authorization': `Bearer ${CORPORATE_TOOLS_API_KEY}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Corporate Tools API Error: ${errorData.message || response.statusText}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching state information:', error);
-    throw error;
-  }
-}
-
-/**
- * Retrieve entity types for a specific state from Corporate Tools
- */
-export async function getEntityTypes(stateCode: string) {
-  if (!CORPORATE_TOOLS_API_KEY) {
-    throw new Error('Corporate Tools API key is not configured');
-  }
-  
-  try {
-    const response = await fetch(`${CORPORATE_TOOLS_API_URL}/entity-types/${stateCode}`, {
-      headers: {
-        'Authorization': `Bearer ${CORPORATE_TOOLS_API_KEY}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Corporate Tools API Error: ${errorData.message || response.statusText}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching entity types:', error);
-    throw error;
-  }
-}
-
-/**
- * Store formation record in our database
- */
-async function storeFormationRecord(formationRecord: any) {
-  try {
-    // For now, just log - we'll implement this using the storage interface
-    console.log('Storing formation record:', formationRecord);
-    
-    // When the database schema is updated to include a formations table:
-    // await storage.createFormation(formationRecord);
-    
-    return formationRecord;
-  } catch (error) {
-    console.error('Error storing formation record:', error);
-    throw error;
-  }
-}
-
-/**
- * Update formation status in our database
- */
-async function updateFormationStatus(provider: string, providerOrderId: string, status: string) {
-  try {
-    // For now, just log - we'll implement this using the storage interface
-    console.log('Updating formation status:', { provider, providerOrderId, status });
-    
-    // When the database schema is updated to include a formations table:
-    // await storage.updateFormationStatus(provider, providerOrderId, status);
-    
-    return { provider, providerOrderId, status };
-  } catch (error) {
-    console.error('Error updating formation status:', error);
-    throw error;
-  }
-}
-
-/**
- * Map Northwest status to standardized status
- */
-function mapNorthwestStatus(northwestStatus: string): string {
-  switch (northwestStatus) {
-    case 'submitted':
-      return 'pending';
-    case 'in-progress':
-      return 'processing';
-    case 'approved':
-      return 'completed';
-    case 'rejected':
-      return 'failed';
-    default:
-      return northwestStatus;
-  }
+  return providers;
 }
