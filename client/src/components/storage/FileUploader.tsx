@@ -1,295 +1,275 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Upload, 
-  File, 
-  CheckCircle2, 
-  AlertCircle,
-  X
-} from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
-import { useMutation } from '@tanstack/react-query';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { UploadIcon, FileIcon, XIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import { getCategoryFromContentType } from '@/lib/storage';
 
 interface FileUploaderProps {
-  allowedTypes?: string[];
-  maxSizeMB?: number;
-  onUploadComplete?: (fileUrl: string, fileName: string) => void;
-  className?: string;
-  buttonText?: string;
-  showCategorySelect?: boolean;
+  userId: number;
+  category?: string;
+  onUploadComplete?: (fileData: {
+    fileName: string;
+    fileUrl: string;
+    fileSize: number;
+    mimeType: string;
+    category: string;
+  }) => void;
+  acceptedFileTypes?: string;
+  maxFileSizeMB?: number;
 }
 
-interface FileUploadResponse {
-  success: boolean;
-  fileName: string;
-  url: string;
-  originalName: string;
-  category: string;
-}
-
-const FileUploader: React.FC<FileUploaderProps> = ({
-  allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.mp4'],
-  maxSizeMB = 10,
+export function FileUploader({
+  userId,
+  category,
   onUploadComplete,
-  className = '',
-  buttonText = 'Upload File',
-  showCategorySelect = true
-}) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [category, setCategory] = useState('other');
+  acceptedFileTypes = '*',
+  maxFileSizeMB = 20
+}: FileUploaderProps) {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const categories = [
-    { value: 'business-plans', label: 'Business Plans' },
-    { value: 'marketing-materials', label: 'Marketing Materials' },
-    { value: 'legal-documents', label: 'Legal Documents' },
-    { value: 'financial-documents', label: 'Financial Documents' },
-    { value: 'presentations', label: 'Presentations' },
-    { value: 'asl-videos', label: 'ASL Videos' },
-    { value: 'profile-pictures', label: 'Profile Pictures' },
-    { value: 'other', label: 'Other' }
-  ];
-
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await fetch('/api/storage/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-      
-      const data = await response.json() as FileUploadResponse;
-      
-      // Set final progress to 100%
-      setUploadProgress(100);
-      return data;
-    },
-    onSuccess: (data) => {
-      if (data.success) {
-        toast({
-          title: 'Upload Successful',
-          description: `${data.originalName} has been uploaded.`,
-        });
-        
-        // Call the callback with the file URL if provided
-        if (onUploadComplete) {
-          onUploadComplete(data.url, data.fileName);
-        }
-        
-        // Reset state after successful upload
-        setSelectedFile(null);
-        setUploadProgress(0);
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: 'Upload Failed',
-        description: 'There was an error uploading your file. Please try again.',
-        variant: 'destructive'
-      });
-      setUploadProgress(0);
-    }
-  });
-
+  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
-    }
-  };
-
-  const validateAndSetFile = (file: File) => {
-    // Check file size
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: `Maximum file size is ${maxSizeMB}MB.`,
-        variant: 'destructive'
-      });
+    const selectedFile = e.target.files?.[0];
+    setError(null);
+    
+    if (!selectedFile) {
+      setFile(null);
       return;
     }
-
-    // Check file type if allowed types are specified
-    if (allowedTypes.length > 0) {
-      const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (!allowedTypes.includes(fileExt) && !allowedTypes.includes('*')) {
-        toast({
-          title: 'File type not allowed',
-          description: `Allowed file types: ${allowedTypes.join(', ')}`,
-          variant: 'destructive'
-        });
-        return;
-      }
-    }
-
-    setSelectedFile(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
     
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
+    // Check file size
+    if (selectedFile.size > maxFileSizeMB * 1024 * 1024) {
+      setError(`File size exceeds the maximum limit of ${maxFileSizeMB}MB.`);
+      setFile(null);
+      return;
     }
-  };
-
-  const handleUpload = () => {
-    if (!selectedFile) return;
     
+    setFile(selectedFile);
+  };
+  
+  // Handle file upload
+  const handleUpload = async () => {
+    if (!file) return;
+    
+    setUploading(true);
+    setProgress(0);
+    setError(null);
+    
+    // Create FormData
     const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('category', category);
+    formData.append('file', file);
+    formData.append('userId', userId.toString());
     
-    uploadMutation.mutate(formData);
+    if (category) {
+      formData.append('category', category);
+    } else {
+      // Auto-detect category based on file type
+      const fileCategory = getCategoryFromContentType(file.type);
+      formData.append('category', fileCategory);
+    }
+    
+    try {
+      // Use XMLHttpRequest for upload progress
+      const xhr = new XMLHttpRequest();
+      
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          setProgress(percentComplete);
+        }
+      });
+      
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const response = JSON.parse(xhr.responseText);
+          
+          toast({
+            title: 'Upload Successful',
+            description: `File "${file.name}" has been uploaded successfully.`,
+            variant: 'default',
+          });
+          
+          if (onUploadComplete) {
+            onUploadComplete({
+              fileName: response.fileName,
+              fileUrl: response.fileUrl,
+              fileSize: response.fileSize,
+              mimeType: response.mimeType,
+              category: response.category,
+            });
+          }
+          
+          // Reset form
+          setFile(null);
+          setProgress(0);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        } else {
+          const errorMsg = xhr.responseText ? JSON.parse(xhr.responseText).message : 'Upload failed';
+          setError(errorMsg || 'An error occurred during upload.');
+          toast({
+            title: 'Upload Failed',
+            description: errorMsg || 'An error occurred during upload.',
+            variant: 'destructive',
+          });
+        }
+        setUploading(false);
+      });
+      
+      xhr.addEventListener('error', () => {
+        setError('Network error occurred during upload.');
+        toast({
+          title: 'Upload Failed',
+          description: 'Network error occurred during upload.',
+          variant: 'destructive',
+        });
+        setUploading(false);
+      });
+      
+      xhr.addEventListener('abort', () => {
+        setError('Upload was cancelled.');
+        toast({
+          title: 'Upload Cancelled',
+          description: 'The upload was cancelled.',
+          variant: 'default',
+        });
+        setUploading(false);
+      });
+      
+      // Open and send the request
+      xhr.open('POST', '/api/storage/upload');
+      xhr.send(formData);
+      
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during upload.');
+      toast({
+        title: 'Upload Failed',
+        description: err.message || 'An error occurred during upload.',
+        variant: 'destructive',
+      });
+      setUploading(false);
+    }
   };
-
-  const openFileSelector = () => {
-    fileInputRef.current?.click();
-  };
-
-  const clearSelectedFile = () => {
-    setSelectedFile(null);
+  
+  // Handle file removal
+  const handleRemoveFile = () => {
+    setFile(null);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
+  
   return (
-    <Card className={`border border-slate-200 ${className}`}>
-      <CardContent className="p-4">
-        <div 
-          className={`border-2 border-dashed rounded-md p-6 ${
-            isDragging ? 'border-primary bg-primary/5' : 'border-slate-300'
-          } transition-colors flex flex-col items-center justify-center cursor-pointer`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={selectedFile ? undefined : openFileSelector}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            accept={allowedTypes.join(',')}
-          />
-          
-          {!selectedFile ? (
-            <>
-              <Upload className="w-10 h-10 text-slate-400 mb-2" />
-              <p className="text-slate-600 text-center mb-1">
-                Drag & drop a file here or click to browse
-              </p>
-              <p className="text-slate-400 text-xs text-center">
-                Allowed file types: {allowedTypes.join(', ')} (Max: {maxSizeMB}MB)
-              </p>
-            </>
-          ) : (
-            <div className="w-full">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <File className="w-5 h-5 text-slate-500 mr-2" />
-                  <span className="text-slate-700 text-sm truncate max-w-[180px]">
-                    {selectedFile.name}
-                  </span>
-                </div>
-                <button 
-                  type="button" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearSelectedFile();
-                  }}
-                  className="text-slate-400 hover:text-slate-600"
+    <div className="w-full">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
+      <div className="space-y-4">
+        {!file ? (
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors">
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <FileIcon className="h-12 w-12 text-gray-400" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium">Select a file to upload</h3>
+                <p className="text-sm text-muted-foreground">
+                  Drag and drop your file or click to browse
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Maximum file size: {maxFileSizeMB}MB
+                </p>
+              </div>
+              
+              <div>
+                <Label htmlFor="fileUpload" className="sr-only">
+                  Choose a file
+                </Label>
+                <Input
+                  id="fileUpload"
+                  ref={fileInputRef}
+                  type="file"
+                  accept={acceptedFileTypes}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center"
                 >
-                  <X className="w-4 h-4" />
-                </button>
+                  <UploadIcon className="mr-2 h-4 w-4" />
+                  Choose File
+                </Button>
               </div>
-              
-              <div className="text-xs text-slate-500 mb-2">
-                {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-              </div>
-              
-              {uploadMutation.isPending && (
-                <div className="mb-2">
-                  <Progress value={uploadProgress} />
-                  <p className="text-xs text-slate-500 mt-1">
-                    Uploading: {uploadProgress}%
+            </div>
+          </div>
+        ) : (
+          <div className="bg-muted/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <FileIcon className="h-8 w-8 text-primary/70" />
+                <div>
+                  <p className="font-medium truncate max-w-[250px]" title={file.name}>
+                    {file.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
-              )}
+              </div>
               
-              {uploadMutation.isSuccess && (
-                <div className="flex items-center text-green-600 text-xs">
-                  <CheckCircle2 className="w-4 h-4 mr-1" />
-                  <span>Upload successful</span>
-                </div>
-              )}
-              
-              {uploadMutation.isError && (
-                <div className="flex items-center text-red-600 text-xs">
-                  <AlertCircle className="w-4 h-4 mr-1" />
-                  <span>Upload failed</span>
-                </div>
-              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRemoveFile}
+                disabled={uploading}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
             </div>
-          )}
-        </div>
-        
-        <div className="mt-4 flex gap-3">
-          {showCategorySelect && (
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          
-          <Button 
-            onClick={handleUpload}
-            disabled={!selectedFile || uploadMutation.isPending}
-            className="flex-1"
-          >
-            {uploadMutation.isPending ? 'Uploading...' : buttonText}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            
+            {uploading && (
+              <div className="mt-4 space-y-2">
+                <Progress value={progress} />
+                <p className="text-xs text-center text-muted-foreground">
+                  Uploading... {progress}%
+                </p>
+              </div>
+            )}
+            
+            {!uploading && (
+              <div className="mt-4">
+                <Button
+                  onClick={handleUpload}
+                  className="w-full"
+                  disabled={uploading}
+                >
+                  <UploadIcon className="mr-2 h-4 w-4" />
+                  Upload File
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
-};
-
-export default FileUploader;
+}

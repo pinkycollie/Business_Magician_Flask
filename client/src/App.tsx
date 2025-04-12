@@ -14,6 +14,7 @@ import ManagePhase from "@/pages/ManagePhase";
 import StoragePage from "@/pages/StoragePage";
 import ResourceLibraryPage from "@/pages/ResourceLibraryPage";
 import { StartupPipelinePage } from "@/pages/StartupPipelinePage";
+import TranslationPage from "@/pages/TranslationPage";
 
 function Router() {
   const [initialFetchCompleted, setInitialFetchCompleted] = useState(false);
@@ -62,6 +63,7 @@ function Router() {
           <Route path="/storage" component={StoragePage} />
           <Route path="/resources" component={ResourceLibraryPage} />
           <Route path="/startup-pipeline" component={StartupPipelinePage} />
+          <Route path="/translation" component={TranslationPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

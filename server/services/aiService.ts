@@ -107,7 +107,7 @@ export async function generateBusinessIdeas(
       const response = await anthropic.messages.create({
         model: "claude-3-7-sonnet-20250219", // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
         system: "You are a business strategy consultant specializing in advising entrepreneurs with disabilities, particularly deaf entrepreneurs.",
-        max_tokens: finalConfig.maxTokens,
+        max_tokens: finalConfig.maxTokens || 4000,
         temperature: finalConfig.temperature,
         messages: [{ role: "user", content: prompt }],
       });
@@ -201,7 +201,7 @@ export async function analyzeBusinessIdea(
       const response = await anthropic.messages.create({
         model: "claude-3-7-sonnet-20250219", // the newest Anthropic model
         system: "You are a business analyst specializing in evaluating business plans for entrepreneurs with disabilities, particularly deaf entrepreneurs.",
-        max_tokens: finalConfig.maxTokens,
+        max_tokens: finalConfig.maxTokens || 4000,
         temperature: finalConfig.temperature,
         messages: [{ role: "user", content: prompt }],
       });

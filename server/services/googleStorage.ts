@@ -1,308 +1,235 @@
+/**
+ * Google Cloud Storage Service
+ * 
+ * This module provides an interface for interacting with Google Cloud Storage
+ * for file management within the application.
+ */
+
 import { Storage } from '@google-cloud/storage';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as crypto from 'crypto';
-import { fileURLToPath } from 'url';
+import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import fs from 'fs';
 
-// Get __dirname equivalent in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Constants
-const BUCKET_NAME = 'business-magician-storage';
-const VIDEOS_FOLDER = 'asl-videos';
-const DOCUMENTS_FOLDER = 'business-documents';
-const TEMPLATES_FOLDER = 'business-templates';
-
-// Check for service account credentials
-export const hasServiceAccount = (() => {
-  try {
-    const keyFilePath = path.join(__dirname, '../config/serviceAccount.json');
-    return fs.existsSync(keyFilePath);
-  } catch (error) {
-    console.error('Error checking for service account:', error);
-    return false;
-  }
-})();
-
-// Initialize storage client if service account is available
-let storageClient: Storage | null = null;
-
-if (hasServiceAccount) {
-  try {
-    const keyFilePath = path.join(__dirname, '../config/serviceAccount.json');
-    storageClient = new Storage({
-      keyFilename: keyFilePath
-    });
-    console.log('Google Cloud Storage client initialized successfully');
-  } catch (error) {
-    console.error('Error initializing Google Cloud Storage:', error);
-  }
+// File categories enum (must match client-side FileCategory enum)
+export enum FileCategory {
+  DOCUMENT = 'documents',
+  IMAGE = 'images',
+  VIDEO = 'videos',
+  AUDIO = 'audio',
+  ASL_VIDEO = 'asl-videos',
+  OTHER = 'other'
 }
 
-// Helper function to generate a unique filename
-function generateUniqueFilename(originalName: string): string {
-  const timestamp = Date.now();
-  const randomString = crypto.randomBytes(8).toString('hex');
-  const extension = path.extname(originalName);
-  const safeName = path.basename(originalName, extension)
-    .replace(/[^a-z0-9]/gi, '-')
-    .toLowerCase();
+// File interface
+export interface File {
+  name: string;
+  size: number;
+  updated: string;
+  url: string;
+  contentType: string;
+}
+
+// Upload result interface
+export interface UploadResult {
+  fileName: string;
+  fileUrl: string;
+  fileSize: number;
+  mimeType: string;
+  category: FileCategory;
+}
+
+// Configure Google Cloud Storage
+let storage: Storage;
+let bucketName: string;
+
+try {
+  // Initialize Cloud Storage
+  // Check if credentials file exists at service account path (for local development)
+  const serviceAccountPath = path.resolve(process.cwd(), 'server/config/serviceAccount.json');
   
-  return `${safeName}-${timestamp}-${randomString}${extension}`;
+  if (fs.existsSync(serviceAccountPath)) {
+    // Use service account file
+    storage = new Storage({
+      keyFilename: serviceAccountPath
+    });
+  } else if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
+    // Use credentials from environment variable
+    const credentials = JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS);
+    storage = new Storage({ credentials });
+  } else {
+    // Use application default credentials (works in GCP environment)
+    storage = new Storage();
+  }
+  
+  // Get bucket name from environment or use default
+  bucketName = process.env.GOOGLE_CLOUD_BUCKET || '360-business-magician-files';
+  
+  console.log('Google Cloud Storage client initialized successfully');
+} catch (error) {
+  console.error('Error initializing Google Cloud Storage:', error);
 }
 
-// Store ASL video to Google Cloud Storage
-export async function storeASLVideo(
-  fileBuffer: Buffer, 
-  originalFilename: string,
-  metadata: {
-    title: string;
-    description?: string;
-    phaseId?: number;
-    taskId?: number;
-  }
-): Promise<{ url: string; filename: string; } | null> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. Video not stored.');
-    return null;
-  }
-
+/**
+ * Upload a file to Google Cloud Storage
+ * 
+ * @param file File object from multer
+ * @param userId User ID who owns the file
+ * @param category File category for organization
+ * @returns UploadResult with file details
+ */
+export async function uploadFile(
+  file: Express.Multer.File,
+  userId: number,
+  category: FileCategory = FileCategory.OTHER
+): Promise<UploadResult> {
   try {
-    const bucket = storageClient.bucket(BUCKET_NAME);
-    const uniqueFilename = generateUniqueFilename(originalFilename);
-    const filePath = `${VIDEOS_FOLDER}/${uniqueFilename}`;
-    const file = bucket.file(filePath);
-
-    // Upload the file
-    await file.save(fileBuffer, {
+    // Generate a unique filename to prevent collisions
+    const fileExtension = path.extname(file.originalname);
+    const fileName = `${path.basename(file.originalname, fileExtension)}-${uuidv4().substring(0, 8)}${fileExtension}`;
+    
+    // Create storage path: users/{userId}/{category}/{fileName}
+    const filePath = `users/${userId}/${category}/${fileName}`;
+    
+    // Get bucket reference
+    const bucket = storage.bucket(bucketName);
+    const fileRef = bucket.file(filePath);
+    
+    // Upload file
+    await fileRef.save(file.buffer, {
+      contentType: file.mimetype,
       metadata: {
-        contentType: getContentType(originalFilename),
+        contentType: file.mimetype,
         metadata: {
-          title: metadata.title,
-          description: metadata.description || '',
-          phaseId: metadata.phaseId?.toString() || '',
-          taskId: metadata.taskId?.toString() || '',
+          originalName: file.originalname,
+          userId: userId.toString(),
+          category,
           uploadedAt: new Date().toISOString()
         }
       }
     });
-
-    // Make the file publicly accessible
-    await file.makePublic();
-
-    // Get the public URL
-    const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${filePath}`;
+    
+    // Make file publicly accessible and get URL
+    await fileRef.makePublic();
+    const publicUrl = `https://storage.googleapis.com/${bucketName}/${filePath}`;
     
     return {
-      url: publicUrl,
-      filename: uniqueFilename
+      fileName,
+      fileUrl: publicUrl,
+      fileSize: file.size,
+      mimeType: file.mimetype,
+      category
     };
-  } catch (error) {
-    console.error('Error storing ASL video to Google Cloud Storage:', error);
-    return null;
+  } catch (error: any) {
+    console.error('Error uploading file to Google Cloud Storage:', error);
+    throw new Error(`File upload failed: ${error.message}`);
   }
 }
 
-// Store business document to Google Cloud Storage
-export async function storeBusinessDocument(
-  fileBuffer: Buffer,
-  originalFilename: string,
-  metadata: {
-    businessId: number;
-    documentType: string;
-    description?: string;
-  }
-): Promise<{ url: string; filename: string; } | null> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. Document not stored.');
-    return null;
-  }
-
+/**
+ * List files for a specific user
+ * 
+ * @param userId User ID
+ * @param category Optional category filter
+ * @returns Array of File objects
+ */
+export async function listUserFiles(
+  userId: number,
+  category?: FileCategory
+): Promise<File[]> {
   try {
-    const bucket = storageClient.bucket(BUCKET_NAME);
-    const uniqueFilename = generateUniqueFilename(originalFilename);
-    const businessFolder = `${DOCUMENTS_FOLDER}/business-${metadata.businessId}`;
-    const filePath = `${businessFolder}/${uniqueFilename}`;
-    const file = bucket.file(filePath);
-
-    // Upload the file
-    await file.save(fileBuffer, {
-      metadata: {
-        contentType: getContentType(originalFilename),
-        metadata: {
-          businessId: metadata.businessId.toString(),
-          documentType: metadata.documentType,
-          description: metadata.description || '',
-          uploadedAt: new Date().toISOString()
-        }
-      }
-    });
-
-    // Make the file publicly accessible
-    await file.makePublic();
-
-    // Get the public URL
-    const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${filePath}`;
+    // Build prefix path based on parameters
+    let prefix = `users/${userId}/`;
+    if (category) {
+      prefix += `${category}/`;
+    }
     
-    return {
-      url: publicUrl,
-      filename: uniqueFilename
-    };
-  } catch (error) {
-    console.error('Error storing business document to Google Cloud Storage:', error);
-    return null;
-  }
-}
-
-// Store business template to Google Cloud Storage
-export async function storeBusinessTemplate(
-  fileBuffer: Buffer,
-  originalFilename: string,
-  metadata: {
-    templateName: string;
-    templateType: string;
-    description?: string;
-  }
-): Promise<{ url: string; filename: string; } | null> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. Template not stored.');
-    return null;
-  }
-
-  try {
-    const bucket = storageClient.bucket(BUCKET_NAME);
-    const uniqueFilename = generateUniqueFilename(originalFilename);
-    const filePath = `${TEMPLATES_FOLDER}/${metadata.templateType}/${uniqueFilename}`;
-    const file = bucket.file(filePath);
-
-    // Upload the file
-    await file.save(fileBuffer, {
-      metadata: {
-        contentType: getContentType(originalFilename),
-        metadata: {
-          templateName: metadata.templateName,
-          templateType: metadata.templateType,
-          description: metadata.description || '',
-          uploadedAt: new Date().toISOString()
-        }
-      }
-    });
-
-    // Make the file publicly accessible
-    await file.makePublic();
-
-    // Get the public URL
-    const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${filePath}`;
+    // Get bucket and list files with prefix
+    const bucket = storage.bucket(bucketName);
+    const [files] = await bucket.getFiles({ prefix });
     
-    return {
-      url: publicUrl,
-      filename: uniqueFilename
-    };
-  } catch (error) {
-    console.error('Error storing business template to Google Cloud Storage:', error);
-    return null;
-  }
-}
-
-// Delete file from Google Cloud Storage
-export async function deleteFile(filePath: string): Promise<boolean> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. File not deleted.');
-    return false;
-  }
-
-  try {
-    const bucket = storageClient.bucket(BUCKET_NAME);
-    const file = bucket.file(filePath);
+    // Build response structure
+    const fileList: File[] = await Promise.all(
+      files
+        // Filter out directories or unwanted files
+        .filter(file => {
+          const fileName = path.basename(file.name);
+          return !fileName.startsWith('.') && !fileName.endsWith('/');
+        })
+        // Map to our File interface
+        .map(async file => {
+          const [metadata] = await file.getMetadata();
+          
+          return {
+            name: path.basename(file.name),
+            size: parseInt(String(metadata.size || '0'), 10),
+            updated: metadata.updated || new Date().toISOString(),
+            url: `https://storage.googleapis.com/${bucketName}/${file.name}`,
+            contentType: metadata.contentType || 'application/octet-stream'
+          };
+        })
+    );
     
-    // Delete the file
-    await file.delete();
-    return true;
-  } catch (error) {
-    console.error('Error deleting file from Google Cloud Storage:', error);
-    return false;
-  }
-}
-
-// List files in a folder
-export async function listFiles(folderPath: string): Promise<{ name: string; url: string; metadata: any; }[]> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. Unable to list files.');
-    return [];
-  }
-
-  try {
-    const bucket = storageClient.bucket(BUCKET_NAME);
-    const [files] = await bucket.getFiles({ prefix: folderPath });
-    
-    return await Promise.all(files.map(async (file) => {
-      const [metadata] = await file.getMetadata();
-      return {
-        name: file.name,
-        url: `https://storage.googleapis.com/${BUCKET_NAME}/${file.name}`,
-        metadata: metadata.metadata || {}
-      };
-    }));
-  } catch (error) {
+    return fileList;
+  } catch (error: any) {
     console.error('Error listing files from Google Cloud Storage:', error);
-    return [];
+    throw new Error(`Failed to list files: ${error.message}`);
   }
 }
 
-// List ASL videos
-export async function listASLVideos(params: { phaseId?: number; taskId?: number; } = {}): Promise<{ name: string; url: string; metadata: any; }[]> {
-  if (!storageClient) {
-    console.warn('Google Cloud Storage client not available. Unable to list ASL videos.');
-    return [];
-  }
-
+/**
+ * Delete a file from Google Cloud Storage
+ * 
+ * @param filePath Full path to the file
+ */
+export async function deleteFile(filePath: string): Promise<void> {
   try {
-    const videos = await listFiles(VIDEOS_FOLDER);
+    const bucket = storage.bucket(bucketName);
+    const file = bucket.file(filePath);
     
-    // Filter videos based on parameters
-    return videos.filter(video => {
-      if (params.phaseId && video.metadata.phaseId !== params.phaseId.toString()) {
-        return false;
-      }
-      if (params.taskId && video.metadata.taskId !== params.taskId.toString()) {
-        return false;
-      }
-      return true;
-    });
-  } catch (error) {
-    console.error('Error listing ASL videos from Google Cloud Storage:', error);
-    return [];
+    // Check if file exists before attempting to delete
+    const [exists] = await file.exists();
+    if (!exists) {
+      throw new Error(`File not found: ${filePath}`);
+    }
+    
+    await file.delete();
+  } catch (error: any) {
+    console.error('Error deleting file from Google Cloud Storage:', error);
+    throw new Error(`Failed to delete file: ${error.message}`);
   }
 }
 
-// Helper function to determine content type based on file extension
-function getContentType(filename: string): string {
-  const extension = path.extname(filename).toLowerCase();
-  
-  const contentTypeMap: Record<string, string> = {
-    '.mp4': 'video/mp4',
-    '.webm': 'video/webm',
-    '.mov': 'video/quicktime',
-    '.pdf': 'application/pdf',
-    '.doc': 'application/msword',
-    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    '.xls': 'application/vnd.ms-excel',
-    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    '.ppt': 'application/vnd.ms-powerpoint',
-    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml',
-    '.zip': 'application/zip',
-    '.json': 'application/json',
-    '.txt': 'text/plain',
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'application/javascript'
-  };
-  
-  return contentTypeMap[extension] || 'application/octet-stream';
+/**
+ * Generate a signed URL for temporary file access
+ * 
+ * @param filePath Full path to the file
+ * @param expirationMinutes Minutes until URL expires (default: 60)
+ * @returns Signed URL string
+ */
+export async function getSignedUrl(
+  filePath: string,
+  expirationMinutes: number = 60
+): Promise<string> {
+  try {
+    const bucket = storage.bucket(bucketName);
+    const file = bucket.file(filePath);
+    
+    // Check if file exists before generating URL
+    const [exists] = await file.exists();
+    if (!exists) {
+      throw new Error(`File not found: ${filePath}`);
+    }
+    
+    // Generate signed URL
+    const [signedUrl] = await file.getSignedUrl({
+      version: 'v4',
+      action: 'read',
+      expires: Date.now() + expirationMinutes * 60 * 1000
+    });
+    
+    return signedUrl;
+  } catch (error: any) {
+    console.error('Error generating signed URL:', error);
+    throw new Error(`Failed to generate signed URL: ${error.message}`);
+  }
 }

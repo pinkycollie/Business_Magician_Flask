@@ -1,145 +1,132 @@
-import { Router, Request, Response } from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import * as googleStorage from '../services/googleStorage';
-import { v4 as uuidv4 } from 'uuid';
+/**
+ * Storage Routes
+ * 
+ * This module provides API endpoints for managing file storage operations
+ * using Google Cloud Storage.
+ */
 
-// Set up multer for handling file uploads
-const upload = multer({ 
-  dest: 'uploads/',
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  }
-});
+import { Router } from 'express';
+import multer from 'multer';
+import * as googleStorage from '../services/googleStorage';
+import { FileCategory } from '../services/googleStorage';
 
 const router = Router();
 
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
-}
-
-// File categories
-const fileCategories = [
-  'business-plans',
-  'marketing-materials',
-  'legal-documents',
-  'financial-documents',
-  'presentations',
-  'asl-videos',
-  'profile-pictures',
-  'other'
-];
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+  }
+});
 
 // Upload a file
-router.post('/upload', upload.single('file'), async (req: Request, res: Response) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
+      return res.status(400).json({ message: 'No file provided' });
     }
 
-    const { originalname } = req.file;
-    const category = fileCategories.includes(req.body.category) 
-      ? req.body.category 
-      : 'other';
-    
-    // Generate unique filename to prevent conflicts
-    const fileExtension = path.extname(originalname);
-    const fileName = `${category}/${uuidv4()}${fileExtension}`;
-    
-    // Upload to Google Cloud Storage
-    const publicUrl = await googleStorage.uploadFile(
-      req.file.path, 
-      fileName
+    const userId = parseInt(req.body.userId || '0', 10);
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    // Get category from request or default to OTHER
+    let category = req.body.category ? 
+      (req.body.category as FileCategory) : 
+      FileCategory.OTHER;
+
+    // Upload the file
+    const result = await googleStorage.uploadFile(
+      req.file, 
+      userId, 
+      category as FileCategory
     );
-    
-    // Clean up local temp file
-    fs.unlinkSync(req.file.path);
-    
-    // Return success response with file URL
-    res.status(200).json({ 
-      success: true, 
-      fileName,
-      url: publicUrl,
-      originalName: originalname,
-      category
+
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error('Error uploading file:', error);
+    return res.status(500).json({ 
+      message: error.message || 'Error uploading file' 
     });
-  } catch (error) {
-    console.error('File upload error:', error);
-    res.status(500).json({ error: 'Failed to upload file' });
   }
 });
 
-// List files by category
-router.get('/files/:category?', async (req: Request, res: Response) => {
+// Get file categories
+router.get('/categories', (req, res) => {
   try {
-    const category = req.params.category;
-    const allFiles = await googleStorage.listFiles();
-    
-    let filteredFiles;
-    if (category && fileCategories.includes(category)) {
-      // Filter files by the requested category
-      filteredFiles = allFiles.filter(file => file.startsWith(`${category}/`));
-    } else {
-      // Return all files
-      filteredFiles = allFiles;
-    }
-    
-    res.status(200).json({
-      success: true,
-      files: filteredFiles
+    // Return available file categories
+    const categories = Object.values(FileCategory);
+    return res.status(200).json(categories);
+  } catch (error: any) {
+    console.error('Error getting file categories:', error);
+    return res.status(500).json({ 
+      message: error.message || 'Error getting file categories' 
     });
-  } catch (error) {
+  }
+});
+
+// List files for a user
+router.get('/files/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    if (!userId) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    // Get optional category from query params
+    const category = req.query.category as FileCategory | undefined;
+
+    const files = await googleStorage.listUserFiles(userId, category);
+    return res.status(200).json(files);
+  } catch (error: any) {
     console.error('Error listing files:', error);
-    res.status(500).json({ error: 'Failed to list files' });
-  }
-});
-
-// Get file details
-router.get('/file/:fileName', async (req: Request, res: Response) => {
-  try {
-    const fileName = req.params.fileName;
-    const exists = await googleStorage.fileExists(fileName);
-    
-    if (!exists) {
-      return res.status(404).json({ error: 'File not found' });
-    }
-    
-    // Generate a signed URL for the file (for secure access)
-    const signedUrl = await googleStorage.getSignedUrl(fileName);
-    
-    res.status(200).json({
-      success: true,
-      fileName,
-      signedUrl,
-      publicUrl: `https://storage.googleapis.com/business-magician-files/${fileName}`
+    return res.status(500).json({ 
+      message: error.message || 'Error listing files' 
     });
-  } catch (error) {
-    console.error('Error getting file details:', error);
-    res.status(500).json({ error: 'Failed to get file details' });
   }
 });
 
 // Delete a file
-router.delete('/file/:fileName', async (req: Request, res: Response) => {
+router.delete('/files', async (req, res) => {
   try {
-    const fileName = req.params.fileName;
-    const exists = await googleStorage.fileExists(fileName);
+    const { filePath } = req.body;
     
-    if (!exists) {
-      return res.status(404).json({ error: 'File not found' });
+    if (!filePath) {
+      return res.status(400).json({ message: 'File path is required' });
     }
-    
-    await googleStorage.deleteFile(fileName);
-    
-    res.status(200).json({
-      success: true,
-      message: 'File deleted successfully'
-    });
-  } catch (error) {
+
+    await googleStorage.deleteFile(filePath);
+    return res.status(200).json({ message: 'File deleted successfully' });
+  } catch (error: any) {
     console.error('Error deleting file:', error);
-    res.status(500).json({ error: 'Failed to delete file' });
+    return res.status(500).json({ 
+      message: error.message || 'Error deleting file' 
+    });
+  }
+});
+
+// Get a signed URL for temporary file access
+router.post('/signed-url', async (req, res) => {
+  try {
+    const { filePath, expirationMinutes } = req.body;
+    
+    if (!filePath) {
+      return res.status(400).json({ message: 'File path is required' });
+    }
+
+    const signedUrl = await googleStorage.getSignedUrl(
+      filePath, 
+      expirationMinutes || 60
+    );
+    
+    return res.status(200).json({ signedUrl });
+  } catch (error: any) {
+    console.error('Error generating signed URL:', error);
+    return res.status(500).json({ 
+      message: error.message || 'Error generating signed URL' 
+    });
   }
 });
 

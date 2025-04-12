@@ -56,6 +56,11 @@ const Header: React.FC = () => {
                   Startup Pipeline
                 </Link>
               </li>
+              <li>
+                <Link href="/translation" className="text-slate-600 hover:text-primary font-medium">
+                  Translation
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex items-center gap-2">
