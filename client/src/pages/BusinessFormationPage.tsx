@@ -1,603 +1,487 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { 
-  Building, 
-  FileText, 
-  ChevronRight, 
-  AlertCircle,
-  Building2,
-  Landmark,
-  FileCheck,
-  BadgeCheck,
-  Globe,
-  Phone,
-  Mail,
-  User,
-  MapPin,
-  Package,
-  Briefcase,
-  UsersRound,
-  FileCog,
-  BookOpen,
-  Banknote,
-  Map
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
 /**
  * Business Formation Page
- * Provides access to business formation services through multiple providers
+ * 
+ * This page allows users to form a business using services from 
+ * Northwest Registered Agent through our branded interface.
  */
-export default function BusinessFormationPage() {
-  const [providers, setProviders] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("services");
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Building, FileText, ClipboardCheck, Map, Briefcase, HelpCircle, ExternalLink } from "lucide-react";
+import { NorthwestAgentApi, EntityType, StateRequirement } from '@/lib/business-formation-api';
+
+// List of US states
+const US_STATES = [
+  { code: 'AL', name: 'Alabama' },
+  { code: 'AK', name: 'Alaska' },
+  { code: 'AZ', name: 'Arizona' },
+  { code: 'AR', name: 'Arkansas' },
+  { code: 'CA', name: 'California' },
+  { code: 'CO', name: 'Colorado' },
+  { code: 'CT', name: 'Connecticut' },
+  { code: 'DE', name: 'Delaware' },
+  { code: 'FL', name: 'Florida' },
+  { code: 'GA', name: 'Georgia' },
+  { code: 'HI', name: 'Hawaii' },
+  { code: 'ID', name: 'Idaho' },
+  { code: 'IL', name: 'Illinois' },
+  { code: 'IN', name: 'Indiana' },
+  { code: 'IA', name: 'Iowa' },
+  { code: 'KS', name: 'Kansas' },
+  { code: 'KY', name: 'Kentucky' },
+  { code: 'LA', name: 'Louisiana' },
+  { code: 'ME', name: 'Maine' },
+  { code: 'MD', name: 'Maryland' },
+  { code: 'MA', name: 'Massachusetts' },
+  { code: 'MI', name: 'Michigan' },
+  { code: 'MN', name: 'Minnesota' },
+  { code: 'MS', name: 'Mississippi' },
+  { code: 'MO', name: 'Missouri' },
+  { code: 'MT', name: 'Montana' },
+  { code: 'NE', name: 'Nebraska' },
+  { code: 'NV', name: 'Nevada' },
+  { code: 'NH', name: 'New Hampshire' },
+  { code: 'NJ', name: 'New Jersey' },
+  { code: 'NM', name: 'New Mexico' },
+  { code: 'NY', name: 'New York' },
+  { code: 'NC', name: 'North Carolina' },
+  { code: 'ND', name: 'North Dakota' },
+  { code: 'OH', name: 'Ohio' },
+  { code: 'OK', name: 'Oklahoma' },
+  { code: 'OR', name: 'Oregon' },
+  { code: 'PA', name: 'Pennsylvania' },
+  { code: 'RI', name: 'Rhode Island' },
+  { code: 'SC', name: 'South Carolina' },
+  { code: 'SD', name: 'South Dakota' },
+  { code: 'TN', name: 'Tennessee' },
+  { code: 'TX', name: 'Texas' },
+  { code: 'UT', name: 'Utah' },
+  { code: 'VT', name: 'Vermont' },
+  { code: 'VA', name: 'Virginia' },
+  { code: 'WA', name: 'Washington' },
+  { code: 'WV', name: 'West Virginia' },
+  { code: 'WI', name: 'Wisconsin' },
+  { code: 'WY', name: 'Wyoming' },
+  { code: 'DC', name: 'District of Columbia' }
+];
+
+const BusinessFormationPage: React.FC = () => {
   const { toast } = useToast();
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedEntityType, setSelectedEntityType] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('services');
 
-  useEffect(() => {
-    // Fetch available business formation providers
-    const fetchProviders = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/business-formation/providers');
-        
-        if (!response.ok) {
-          throw new Error(`API responded with status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setProviders(data.providers || []);
-        // For testing purposes, if no providers are returned from the API, set some defaults
-        if (!data.providers || data.providers.length === 0) {
-          setProviders(['corporatetools', 'northwest', 'zenbusiness']);
-        }
-      } catch (err) {
-        console.error('Failed to fetch business formation providers:', err);
-        setError('Failed to load business formation providers. Please try again later.');
-        // For testing/demo purposes, set default providers even if API fails
-        setProviders(['corporatetools', 'northwest', 'zenbusiness']);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Check Northwest API status
+  const { data: apiStatus, isLoading: isStatusLoading } = useQuery({
+    queryKey: [`${NorthwestAgentApi.checkStatus}`],
+    queryFn: NorthwestAgentApi.checkStatus,
+    enabled: true,
+  });
 
-    fetchProviders();
-  }, []);
+  // Query entity types when a state is selected
+  const { 
+    data: entityTypesData, 
+    isLoading: isEntityTypesLoading 
+  } = useQuery({
+    queryKey: [`${NorthwestAgentApi.getEntityTypes}`, selectedState],
+    queryFn: () => NorthwestAgentApi.getEntityTypes(selectedState),
+    enabled: !!selectedState && selectedState.length > 0,
+  });
 
-  // Map provider ID to display info
-  const getProviderInfo = (providerId: string) => {
-    switch (providerId) {
-      case 'corporatetools':
-        return {
-          name: 'Corporate Tools',
-          description: 'Comprehensive business formation services with easy-to-use online filing',
-          icon: <Building className="h-6 w-6 text-blue-600" />,
-          color: 'border-blue-200 bg-blue-50'
-        };
-      case 'northwest':
-        return {
-          name: 'Northwest Registered Agent',
-          description: 'Premium registered agent services with business formation options',
-          icon: <Landmark className="h-6 w-6 text-purple-600" />,
-          color: 'border-purple-200 bg-purple-50'
-        };
-      case 'zenbusiness':
-        return {
-          name: 'ZenBusiness',
-          description: 'Streamlined formation services with advanced compliance tools',
-          icon: <Building2 className="h-6 w-6 text-green-600" />,
-          color: 'border-green-200 bg-green-50'
-        };
-      default:
-        return {
-          name: providerId,
-          description: 'Business formation services',
-          icon: <Building className="h-6 w-6 text-gray-600" />,
-          color: 'border-gray-200 bg-gray-50'
-        };
+  // Query state requirements when a state is selected
+  const { 
+    data: stateRequirementsData, 
+    isLoading: isRequirementsLoading 
+  } = useQuery({
+    queryKey: [`${NorthwestAgentApi.getStateRequirements}`, selectedState],
+    queryFn: () => NorthwestAgentApi.getStateRequirements(selectedState),
+    enabled: !!selectedState && selectedState.length > 0,
+  });
+
+  // Query registered agent services
+  const { 
+    data: agentServicesData, 
+    isLoading: isServicesLoading 
+  } = useQuery({
+    queryKey: [`${NorthwestAgentApi.getRegisteredAgentServices}`],
+    queryFn: NorthwestAgentApi.getRegisteredAgentServices,
+    enabled: true,
+  });
+
+  const handleStartFormation = () => {
+    if (!selectedState) {
+      toast({
+        title: "State Required",
+        description: "Please select a state to form your business in.",
+        variant: "destructive",
+      });
+      return;
     }
-  };
 
-  const handleStartFormation = (provider: string) => {
+    if (!selectedEntityType) {
+      toast({
+        title: "Entity Type Required",
+        description: "Please select a business entity type.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Redirect to form page or open modal
     toast({
-      title: "Formation Service Selected",
-      description: `You selected ${getProviderInfo(provider).name}. Redirecting to formation form.`,
+      title: "Starting Business Formation",
+      description: `Preparing to form your ${selectedEntityType} in ${selectedState}`,
     });
-    // Will navigate to provider-specific form in a real implementation
+    // Here you would navigate to a detailed form
   };
 
-  // Loading state
-  if (loading) {
+  const renderEntityTypes = () => {
+    if (isEntityTypesLoading) {
+      return <div className="flex justify-center p-8">Loading entity types...</div>;
+    }
+
+    if (!entityTypesData?.entityTypes || entityTypesData.entityTypes.length === 0) {
+      return (
+        <div className="p-8 text-center">
+          <HelpCircle className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+          <p>Please select a state to view available entity types.</p>
+        </div>
+      );
+    }
+
     return (
-      <div className="container mx-auto py-10 px-4 flex justify-center">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          <p className="mt-4 text-slate-600">Loading business formation services...</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        {entityTypesData.entityTypes.map((entityType: EntityType) => (
+          <Card 
+            key={entityType.id}
+            className={`cursor-pointer transition-all hover:shadow-md ${
+              selectedEntityType === entityType.id ? 'border-primary border-2' : ''
+            }`}
+            onClick={() => setSelectedEntityType(entityType.id)}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">{entityType.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">{entityType.description}</p>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Advantages:</p>
+                <ul className="text-sm pl-5 list-disc space-y-1">
+                  {entityType.advantages.map((advantage, i) => (
+                    <li key={`adv-${i}`}>{advantage}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              {entityType.disadvantages.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  <p className="text-sm font-medium">Considerations:</p>
+                  <ul className="text-sm pl-5 list-disc space-y-1">
+                    {entityType.disadvantages.map((disadvantage, i) => (
+                      <li key={`dis-${i}`}>{disadvantage}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter>
+              <Button 
+                variant={selectedEntityType === entityType.id ? "default" : "outline"}
+                className="w-full"
+                onClick={() => setSelectedEntityType(entityType.id)}
+              >
+                {selectedEntityType === entityType.id ? 'Selected' : 'Select'}
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  const renderStateRequirements = () => {
+    if (isRequirementsLoading) {
+      return <div className="flex justify-center p-8">Loading state requirements...</div>;
+    }
+
+    if (!stateRequirementsData?.requirements || stateRequirementsData.requirements.length === 0) {
+      return (
+        <div className="p-8 text-center">
+          <HelpCircle className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+          <p>Please select a state to view filing requirements.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4 p-4">
+        <h3 className="text-lg font-medium">Filing Requirements for {US_STATES.find(s => s.code === selectedState)?.name}</h3>
+        <div className="rounded-md border">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/50">
+                <th className="h-10 px-4 text-left align-middle font-medium">Requirement</th>
+                <th className="h-10 px-4 text-left align-middle font-medium">Description</th>
+                <th className="h-10 px-4 text-left align-middle font-medium">Required</th>
+                <th className="h-10 px-4 text-right align-middle font-medium">Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stateRequirementsData.requirements.map((req: StateRequirement) => (
+                <tr key={req.id} className="border-b">
+                  <td className="p-4 align-middle font-medium">{req.name}</td>
+                  <td className="p-4 align-middle">{req.description}</td>
+                  <td className="p-4 align-middle">
+                    {req.isRequired ? (
+                      <span className="rounded-full bg-green-100 text-green-800 px-2 py-1 text-xs font-medium">
+                        Required
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-gray-100 text-gray-800 px-2 py-1 text-xs font-medium">
+                        Optional
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-4 align-middle text-right">
+                    {req.additionalFee ? `$${req.additionalFee.toFixed(2)}` : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
-  }
+  };
 
-  // Error state (but with default providers for demo purposes)
-  if (error && providers.length === 0) {
+  const renderRegisteredAgentServices = () => {
+    if (isServicesLoading) {
+      return <div className="flex justify-center p-8">Loading registered agent services...</div>;
+    }
+
+    if (!agentServicesData?.services || agentServicesData.services.length === 0) {
+      return (
+        <div className="p-8 text-center">
+          <HelpCircle className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+          <p>No registered agent services available.</p>
+        </div>
+      );
+    }
+
     return (
-      <div className="container mx-auto py-10 px-4">
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error}
-          </AlertDescription>
-        </Alert>
-        <Button onClick={() => window.location.reload()}>
-          Try Again
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+        {agentServicesData.services.map((service: any) => (
+          <Card key={service.id}>
+            <CardHeader>
+              <CardTitle>{service.name}</CardTitle>
+              <CardDescription>{service.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold mb-4">${service.annualFee}/year</p>
+              <ul className="space-y-2">
+                {service.features.map((feature: string, i: number) => (
+                  <li key={i} className="flex items-start">
+                    <ClipboardCheck className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                    <span className="text-sm">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full">Select Plan</Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     );
-  }
+  };
 
-  // Services component
-  const ServicesSection = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Building className="h-6 w-6 text-primary" />
-            <CardTitle>Filing Services</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Form an LLC</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Incorporate</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Form a Nonprofit</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Stay Compliant</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Foreign Qualification</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <User className="h-6 w-6 text-primary" />
-            <CardTitle>Identity</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Business Identity</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Instant Domain Name</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Business Website</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Business Email</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Phone Service</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Landmark className="h-6 w-6 text-primary" />
-            <CardTitle>Registered Agent</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Registered Agent Service</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Change Registered Agents</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>BOC-3 Process Agent</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>National Registered Agent</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Package className="h-6 w-6 text-primary" />
-            <CardTitle>Additional Services</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Mail Forwarding</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Virtual Office</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Trademark Service</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>EIN Service</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const renderStateGuides = () => {
+    if (!selectedState) {
+      return (
+        <div className="p-8 text-center">
+          <Map className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+          <p>Please select a state to view business formation guides.</p>
+        </div>
+      );
+    }
 
-  // Resources component
-  const ResourcesSection = () => (
-    <div className="space-y-8 mb-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Briefcase className="h-6 w-6 text-primary" />
-              <CardTitle>Get Started</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Start a Business</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Small Business Ideas</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>LLC vs. Corporation</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Get a DBA Name</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <FileCog className="h-6 w-6 text-primary" />
-              <CardTitle>Keep it Running</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Maintain a Business</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Certificate of Good Standing</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Apostille</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Certified Copy</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 text-primary" />
-            <CardTitle>Business Documents</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Legal Forms</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>LLC Operating Agreements</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Single-Member LLC Operating Agreement</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>LLC Bank Account Resolution</span>
-              </li>
-            </ul>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Corporate Bylaws</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Certificate of Stock</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Initial Board Meeting</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span>Nonprofit Bylaws</span>
-              </li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+    const stateName = US_STATES.find(s => s.code === selectedState)?.name;
 
-  // State-by-State section
-  const StateByStateSection = () => (
-    <div className="space-y-8 mb-12">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Map className="h-6 w-6 text-primary" />
-            <CardTitle>State-by-State Business Formation</CardTitle>
-          </div>
-          <CardDescription>
-            Access detailed guides for starting a business in each U.S. state and territory
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="popular-states">
-              <AccordionTrigger>Popular States</AccordionTrigger>
-              <AccordionContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> Texas
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> California
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> Florida
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> New York
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> Delaware
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <MapPin className="mr-2 h-4 w-4" /> Illinois
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="all-states">
-              <AccordionTrigger>All States</AccordionTrigger>
-              <AccordionContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-                  {['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 
-                    'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 
-                    'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 
-                    'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 
-                    'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 
-                    'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 
-                    'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 
-                    'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
-                    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 
-                    'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia'].map(state => (
-                    <Button key={state} variant="outline" className="justify-start">
-                      <MapPin className="mr-2 h-4 w-4" /> {state}
-                    </Button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="territories">
-              <AccordionTrigger>U.S. Territories</AccordionTrigger>
-              <AccordionContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                  {['Puerto Rico', 'U.S. Virgin Islands', 'Guam', 
-                    'American Samoa', 'Northern Mariana Islands'].map(territory => (
-                    <Button key={territory} variant="outline" className="justify-start">
-                      <MapPin className="mr-2 h-4 w-4" /> {territory}
-                    </Button>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <CardTitle>Corporate Guides</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Our Manifesto</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Privacy by Default</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span>Live Privately with an LLC</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  // Main component render
-  return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Business Formation Services</h1>
-        <p className="text-lg text-slate-600 mb-8">
-          Form your business entity with our trusted partners. We provide seamless integration with top business formation providers.
+    return (
+      <div className="space-y-6 p-4">
+        <h3 className="text-xl font-semibold">Business Formation Guide for {stateName}</h3>
+        <p className="text-muted-foreground">
+          Everything you need to know about forming a business in {stateName}.
         </p>
-        
-        <Tabs defaultValue="services" className="mb-12">
-          <TabsList className="mb-6">
-            <TabsTrigger value="services" onClick={() => setActiveTab("services")}>Services</TabsTrigger>
-            <TabsTrigger value="providers" onClick={() => setActiveTab("providers")}>Formation Providers</TabsTrigger>
-            <TabsTrigger value="resources" onClick={() => setActiveTab("resources")}>Resources</TabsTrigger>
-            <TabsTrigger value="state-guides" onClick={() => setActiveTab("state-guides")}>State Guides</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="services">
-            <h2 className="text-2xl font-semibold mb-6">Available Services</h2>
-            <ServicesSection />
-          </TabsContent>
-          
-          <TabsContent value="providers">
-            <h2 className="text-2xl font-semibold mb-6">Formation Providers</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {providers.map((provider) => {
-                const info = getProviderInfo(provider);
-                return (
-                  <Card key={provider} className={`border-2 ${info.color}`}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {info.icon}
-                          <CardTitle>{info.name}</CardTitle>
-                        </div>
-                      </div>
-                      <CardDescription>{info.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <FileCheck className="h-4 w-4 text-slate-500" />
-                          <span className="text-sm">LLC, Corporation, and Partnership filings</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 text-slate-500" />
-                          <span className="text-sm">All 50 states supported</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <BadgeCheck className="h-4 w-4 text-slate-500" />
-                          <span className="text-sm">Registered agent services available</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button 
-                        className="w-full"
-                        onClick={() => handleStartFormation(provider)}
-                      >
-                        Start Formation <ChevronRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                );
-              })}
-            </div>
-            
-            <div className="bg-slate-100 p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-4">Business Formation Process</h3>
-              <ol className="list-decimal pl-5 space-y-2">
-                <li className="text-slate-700">Select a business formation provider</li>
-                <li className="text-slate-700">Choose your business entity type</li>
-                <li className="text-slate-700">Provide business and owner information</li>
-                <li className="text-slate-700">Select any additional services (registered agent, EIN, etc.)</li>
-                <li className="text-slate-700">Review and submit your formation</li>
-                <li className="text-slate-700">Track your filing status in real-time</li>
-                <li className="text-slate-700">Receive your formation documents digitally</li>
-              </ol>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="resources">
-            <h2 className="text-2xl font-semibold mb-6">Business Resources</h2>
-            <ResourcesSection />
-          </TabsContent>
-          
-          <TabsContent value="state-guides">
-            <h2 className="text-2xl font-semibold mb-6">State-Specific Formation Guides</h2>
-            <StateByStateSection />
-          </TabsContent>
-        </Tabs>
-        
-        <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 mb-8">
-          <h2 className="text-xl font-bold mb-4">ASL Support for Business Formation</h2>
-          <p className="mb-4">
-            All our business formation services include ASL video support at each step of the process.
-            Our dedicated ASL interpreters will guide you through the entire formation process.
-          </p>
-          <Button variant="outline">
-            View ASL Formation Guides
-          </Button>
-        </div>
-        
-        <div className="mt-8 flex justify-center">
-          <Button variant="outline" onClick={() => window.history.back()}>
-            Back to Business Tools
-          </Button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Registration Process
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Learn about the step-by-step process to register your business in {stateName}.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">Read Guide</Button>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Briefcase className="h-5 w-5 mr-2" />
+                Tax Considerations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Understand the tax implications of different business structures in {stateName}.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">Read Guide</Button>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Building className="h-5 w-5 mr-2" />
+                Licensing Requirements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Discover what licenses and permits your business may need in {stateName}.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">Read Guide</Button>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <ExternalLink className="h-5 w-5 mr-2" />
+                {stateName} Business Resources
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                External resources and government websites for business owners in {stateName}.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">View Resources</Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold tracking-tight">Form Your Business Today</h1>
+        <p className="text-muted-foreground mt-2">
+          Professional business formation services powered by Northwest Registered Agent
+        </p>
+      </div>
+
+      {isStatusLoading ? (
+        <div className="flex justify-center py-8">Loading API status...</div>
+      ) : !apiStatus?.configured ? (
+        <Card className="mx-auto max-w-lg">
+          <CardHeader>
+            <CardTitle className="text-orange-500">API Not Configured</CardTitle>
+            <CardDescription>
+              The Northwest Registered Agent API is not properly configured.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Please contact support to fix this issue.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="mb-4">
+              <Label htmlFor="state-select">Select State of Formation</Label>
+              <Select
+                value={selectedState}
+                onValueChange={(value) => {
+                  setSelectedState(value);
+                  setSelectedEntityType('');
+                }}
+              >
+                <SelectTrigger id="state-select">
+                  <SelectValue placeholder="Select a state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map((state) => (
+                    <SelectItem key={state.code} value={state.code}>
+                      {state.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-4xl mx-auto">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="entity-types">Entity Types</TabsTrigger>
+              <TabsTrigger value="requirements">Requirements</TabsTrigger>
+              <TabsTrigger value="state-guides">State Guides</TabsTrigger>
+            </TabsList>
+            <div className="mt-6 border rounded-lg">
+              <TabsContent value="services" className="m-0">
+                {renderRegisteredAgentServices()}
+              </TabsContent>
+              <TabsContent value="entity-types" className="m-0">
+                {renderEntityTypes()}
+              </TabsContent>
+              <TabsContent value="requirements" className="m-0">
+                {renderStateRequirements()}
+              </TabsContent>
+              <TabsContent value="state-guides" className="m-0">
+                {renderStateGuides()}
+              </TabsContent>
+            </div>
+          </Tabs>
+
+          <div className="max-w-xs mx-auto mt-8">
+            <Button 
+              size="lg" 
+              className="w-full" 
+              onClick={handleStartFormation}
+              disabled={!selectedState || !selectedEntityType}
+            >
+              Start Business Formation
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default BusinessFormationPage;
