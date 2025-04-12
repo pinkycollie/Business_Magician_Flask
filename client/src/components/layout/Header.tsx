@@ -66,6 +66,11 @@ const Header: React.FC = () => {
                   Business Tools
                 </Link>
               </li>
+              <li>
+                <Link href="/ecosystem" className="text-slate-600 hover:text-primary font-medium">
+                  360 Magicians
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex items-center gap-2">

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Magicians Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <div class="flex items-center">
+                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-blue-600">
+                            <path d="M18 3L34.5 13.5V22.5L18 33L1.5 22.5V13.5L18 3Z" stroke="currentColor" stroke-width="3" fill="none"/>
+                            <path d="M18 33V22.5M18 22.5L34.5 13.5M18 22.5L1.5 13.5M18 3L34.5 13.5M18 3L1.5 13.5" stroke="currentColor" stroke-width="3" fill="none"/>
+                        </svg>
+                        <span class="text-xl font-bold ml-2 font-heading text-slate-900">360 Magicians</span>
+                    </div>
+                </div>
+                <nav class="hidden md:flex flex-1 justify-center">
+                    <ul class="flex space-x-8">
+                        <li>
+                            <a href="#" class="text-slate-600 hover:text-blue-600 font-medium">Home</a>
+                        </li>
+                        <li>
+                            <a href="#business" class="text-slate-600 hover:text-blue-600 font-medium">Business Magician</a>
+                        </li>
+                        <li>
+                            <a href="#job" class="text-slate-600 hover:text-blue-600 font-medium">Job Magician</a>
+                        </li>
+                        <li>
+                            <a href="#vr4deaf" class="text-slate-600 hover:text-blue-600 font-medium">VR4Deaf</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold mb-6">360 Magicians Ecosystem</h1>
+            
+            <div class="mb-8">
+                <p class="text-lg text-gray-700 mb-4">
+                    The 360 Magicians platform evolves through three specialized components, 
+                    starting with Business and Job Magicians, and introducing the VR4Deaf 
+                    pilot for comprehensive vocational rehabilitation services.
+                </p>
+                
+                <p class="text-lg text-gray-700">
+                    Each component is independently accessible while sharing a common foundation
+                    of accessibility features, ASL resources, and user support systems.
+                </p>
+            </div>
+            
+            <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-xl font-bold mb-4">Ecosystem Navigation</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-blue-500 hover:bg-blue-600 p-4 rounded-md transition-all">
+                        <h3 class="font-semibold text-lg">Business Magician</h3>
+                        <p class="text-sm text-gray-100 mt-1 mb-3">
+                            Start or grow your business with expert guidance
+                        </p>
+                        <a 
+                            href="https://business.360magicians.com"
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="inline-block px-3 py-1 bg-white text-gray-800 rounded text-sm font-medium"
+                        >
+                            Visit Business Magician
+                        </a>
+                    </div>
+                    
+                    <div class="bg-purple-500 hover:bg-purple-600 p-4 rounded-md transition-all">
+                        <h3 class="font-semibold text-lg">Job Magician</h3>
+                        <p class="text-sm text-gray-100 mt-1 mb-3">
+                            Find employment and advance your career
+                        </p>
+                        <a 
+                            href="https://job.360magicians.com"
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="inline-block px-3 py-1 bg-white text-gray-800 rounded text-sm font-medium"
+                        >
+                            Visit Job Magician
+                        </a>
+                    </div>
+                    
+                    <div class="bg-green-500 hover:bg-green-600 p-4 rounded-md transition-all">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold text-lg">VR4Deaf</h3>
+                            <span class="inline-block px-2 py-1 bg-yellow-500 text-xs font-semibold rounded">
+                                PILOT
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-100 mt-1 mb-3">
+                            Specialized vocational rehabilitation services
+                        </p>
+                        <a 
+                            href="https://vr4deaf.360magicians.com"
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="inline-block px-3 py-1 bg-white text-gray-800 rounded text-sm font-medium"
+                        >
+                            Visit VR4Deaf
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <div class="inline-flex items-center">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        <span class="text-xs">All services feature ASL support</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="business" class="mt-12 pt-2 -mt-2">
+                <div class="bg-white shadow-md rounded-lg p-6 border-t-4 border-blue-500 mb-8">
+                    <h2 class="text-2xl font-bold mb-3">Business Magician</h2>
+                    <p class="text-gray-700 mb-4">
+                        Dedicated to supporting deaf entrepreneurs through the complete 
+                        business lifecycle - from idea generation to building, growing,
+                        and managing a business.
+                    </p>
+                    
+                    <h3 class="font-medium text-gray-800 mb-2">Key Features:</h3>
+                    <ul class="list-disc pl-5 text-gray-700 mb-4">
+                        <li>Business idea generation</li>
+                        <li>Formation documents</li>
+                        <li>Growth strategies</li>
+                        <li>Financial planning</li>
+                    </ul>
+                    
+                    <div class="bg-blue-50 p-4 rounded-md">
+                        <h4 class="font-medium text-blue-800 mb-2">Business Lifecycle</h4>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-blue-100 p-2 rounded">
+                                <span class="text-sm font-medium text-blue-800">Idea</span>
+                            </div>
+                            <div class="bg-blue-100 p-2 rounded">
+                                <span class="text-sm font-medium text-blue-800">Build</span>
+                            </div>
+                            <div class="bg-blue-100 p-2 rounded">
+                                <span class="text-sm font-medium text-blue-800">Grow</span>
+                            </div>
+                            <div class="bg-blue-100 p-2 rounded">
+                                <span class="text-sm font-medium text-blue-800">Manage</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="job" class="pt-2 -mt-2">
+                <div class="bg-white shadow-md rounded-lg p-6 border-t-4 border-purple-500 mb-8">
+                    <h2 class="text-2xl font-bold mb-3">Job Magician</h2>
+                    <p class="text-gray-700 mb-4">
+                        Helps deaf job seekers find, secure, and advance in employment 
+                        opportunities through job matching, skills development, and 
+                        workplace accommodation guidance.
+                    </p>
+                    
+                    <h3 class="font-medium text-gray-800 mb-2">Key Features:</h3>
+                    <ul class="list-disc pl-5 text-gray-700 mb-4">
+                        <li>Resume building</li>
+                        <li>Job matching</li>
+                        <li>Interview preparation</li>
+                        <li>Career advancement</li>
+                    </ul>
+                    
+                    <div class="bg-purple-50 p-4 rounded-md">
+                        <h4 class="font-medium text-purple-800 mb-2">Job Search Process</h4>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-purple-100 p-2 rounded">
+                                <span class="text-sm font-medium text-purple-800">Prepare</span>
+                            </div>
+                            <div class="bg-purple-100 p-2 rounded">
+                                <span class="text-sm font-medium text-purple-800">Search</span>
+                            </div>
+                            <div class="bg-purple-100 p-2 rounded">
+                                <span class="text-sm font-medium text-purple-800">Interview</span>
+                            </div>
+                            <div class="bg-purple-100 p-2 rounded">
+                                <span class="text-sm font-medium text-purple-800">Advance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="vr4deaf" class="pt-2 -mt-2">
+                <div class="bg-white shadow-md rounded-lg p-6 border-t-4 border-green-500 mb-8">
+                    <div class="flex justify-between items-start mb-3">
+                        <h2 class="text-2xl font-bold">VR4Deaf Pilot</h2>
+                        <span class="inline-block px-2 py-1 bg-yellow-500 text-xs font-semibold rounded">
+                            PILOT PROGRAM
+                        </span>
+                    </div>
+                    <p class="text-gray-700 mb-4">
+                        Provides specialized vocational rehabilitation services following
+                        the standard 5-step VR process, with particular focus on the unique
+                        needs of deaf and hard of hearing clients.
+                    </p>
+                    
+                    <h3 class="font-medium text-gray-800 mb-2">Key Features:</h3>
+                    <ul class="list-disc pl-5 text-gray-700 mb-4">
+                        <li>VR application assistance</li>
+                        <li>Eligibility determination</li>
+                        <li>IPE development</li>
+                        <li>Service provision</li>
+                        <li>Employment support</li>
+                    </ul>
+                    
+                    <div class="p-6 bg-green-50 rounded-lg">
+                        <h4 class="text-xl font-bold mb-4 text-green-800">VR Process</h4>
+                        <ol class="list-decimal pl-6 space-y-2">
+                            <li class="text-gray-700"><span class="font-semibold">Application and Intake:</span> Initial contact, information gathering, and needs assessment.</li>
+                            <li class="text-gray-700"><span class="font-semibold">Eligibility Determination:</span> Evaluation and assessment of qualification for VR services.</li>
+                            <li class="text-gray-700"><span class="font-semibold">Individualized Plan for Employment (IPE):</span> Developing a personalized roadmap for success.</li>
+                            <li class="text-gray-700"><span class="font-semibold">Service Provision:</span> Implementation of training, counseling, and support services.</li>
+                            <li class="text-gray-700"><span class="font-semibold">Employment and Follow-Up:</span> Job placement, retention support, and ongoing assistance.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-700 text-white p-6 rounded-lg">
+                <h2 class="text-xl font-bold mb-3">About the 360 Magicians Ecosystem</h2>
+                <p class="text-gray-300">
+                    The 360 Magicians platform brings together specialized services for entrepreneurs and job seekers, 
+                    with a dedicated VR4Deaf pilot focusing on vocational rehabilitation. Each component is designed 
+                    to work independently while sharing resources and accessibility features.
+                </p>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h3 class="font-medium mb-2 text-blue-300">Business Magician</h3>
+                        <p class="text-sm text-gray-400">Empowering deaf entrepreneurs through the complete business lifecycle</p>
+                    </div>
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h3 class="font-medium mb-2 text-purple-300">Job Magician</h3>
+                        <p class="text-sm text-gray-400">Connecting deaf professionals with employment opportunities</p>
+                    </div>
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h3 class="font-medium mb-2 text-green-300">VR4Deaf Pilot</h3>
+                        <p class="text-sm text-gray-400">Specialized vocational rehabilitation for deaf individuals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center gap-2">
+                        <svg width="24" height="24" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-white">
+                            <path d="M18 3L34.5 13.5V22.5L18 33L1.5 22.5V13.5L18 3Z" stroke="currentColor" stroke-width="3" fill="none"/>
+                            <path d="M18 33V22.5M18 22.5L34.5 13.5M18 22.5L1.5 13.5M18 3L34.5 13.5M18 3L1.5 13.5" stroke="currentColor" stroke-width="3" fill="none"/>
+                        </svg>
+                        <span class="text-lg font-bold">360 Magicians</span>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-400">
+                        Empowering deaf entrepreneurs and job seekers with accessible, technology-driven services.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider mb-3">Services</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#business" class="text-gray-400 hover:text-white">Business Magician</a></li>
+                            <li><a href="#job" class="text-gray-400 hover:text-white">Job Magician</a></li>
+                            <li><a href="#vr4deaf" class="text-gray-400 hover:text-white">VR4Deaf</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider mb-3">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">ASL Video Library</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Learning Center</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Success Stories</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider mb-3">Company</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-700">
+                <p class="text-sm text-gray-400 text-center">
+                    &copy; 2025 360 Magicians. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

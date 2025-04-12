@@ -1,5 +1,8 @@
 #!/bin/bash
+# Run the API server with Notion and Cloud Storage integrations
 
-# This script runs the bare minimum server
-echo "Starting 360 Business Magician API server..."
-node --import tsx server/bare-minimum.ts
+# Exit on error
+set -e
+
+# Run the optimized API server
+node api-server-notion.js

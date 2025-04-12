@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, varchar, date } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -246,3 +246,112 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
 
 export type Resource = typeof resources.$inferSelect;
 export type InsertResource = z.infer<typeof insertResourceSchema>;
+
+// Business Formation tables
+
+// Formation Providers
+export const formationProviders = pgTable("formation_providers", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(),
+  displayName: varchar("display_name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  logoUrl: text("logo_url"),
+  website: text("website"),
+  apiEndpoint: text("api_endpoint"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertFormationProviderSchema = createInsertSchema(formationProviders).pick({
+  name: true,
+  displayName: true,
+  description: true,
+  logoUrl: true,
+  website: true,
+  apiEndpoint: true,
+  isActive: true,
+});
+
+export type FormationProvider = typeof formationProviders.$inferSelect;
+export type InsertFormationProvider = z.infer<typeof insertFormationProviderSchema>;
+
+// Business Formation Records
+export const businessFormations = pgTable("business_formations", {
+  id: serial("id").primaryKey(),
+  businessId: integer("business_id").notNull(),
+  userId: integer("user_id").notNull(),
+  providerId: integer("provider_id").notNull(),
+  providerOrderId: varchar("provider_order_id", { length: 100 }).notNull(),
+  businessName: varchar("business_name", { length: 200 }).notNull(),
+  entityType: varchar("entity_type", { length: 50 }).notNull(),
+  state: varchar("state", { length: 2 }).notNull(),
+  status: varchar("status", { length: 20 }).notNull(), // pending, processing, completed, failed
+  submittedDate: timestamp("submitted_date").defaultNow(),
+  estimatedCompletionDate: date("estimated_completion_date"),
+  completedDate: timestamp("completed_date"),
+  trackingUrl: text("tracking_url"),
+  formationData: json("formation_data"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBusinessFormationSchema = createInsertSchema(businessFormations).pick({
+  businessId: true,
+  userId: true,
+  providerId: true,
+  providerOrderId: true,
+  businessName: true,
+  entityType: true,
+  state: true,
+  status: true,
+  estimatedCompletionDate: true,
+  trackingUrl: true,
+  formationData: true,
+});
+
+export type BusinessFormation = typeof businessFormations.$inferSelect;
+export type InsertBusinessFormation = z.infer<typeof insertBusinessFormationSchema>;
+
+// Business Formation Documents
+export const formationDocuments = pgTable("formation_documents", {
+  id: serial("id").primaryKey(),
+  formationId: integer("formation_id").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  documentUrl: text("document_url").notNull(),
+  documentType: varchar("document_type", { length: 50 }), // articles, operating agreement, EIN, etc.
+  dateIssued: date("date_issued"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertFormationDocumentSchema = createInsertSchema(formationDocuments).pick({
+  formationId: true,
+  name: true,
+  documentUrl: true,
+  documentType: true,
+  dateIssued: true,
+});
+
+export type FormationDocument = typeof formationDocuments.$inferSelect;
+export type InsertFormationDocument = z.infer<typeof insertFormationDocumentSchema>;
+
+// Formation Provider API Keys
+export const providerApiKeys = pgTable("provider_api_keys", {
+  id: serial("id").primaryKey(),
+  providerId: integer("provider_id").notNull(),
+  keyName: varchar("key_name", { length: 100 }).notNull(),
+  keyValue: text("key_value").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertProviderApiKeySchema = createInsertSchema(providerApiKeys).pick({
+  providerId: true,
+  keyName: true,
+  keyValue: true,
+  isActive: true,
+});
+
+export type ProviderApiKey = typeof providerApiKeys.$inferSelect;
+export type InsertProviderApiKey = z.infer<typeof insertProviderApiKeySchema>;

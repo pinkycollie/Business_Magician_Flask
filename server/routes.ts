@@ -20,6 +20,8 @@ import anthropicRoutes from "./routes/anthropic";
 import aiRoutes from "./routes/ai";
 import aiControllerRoutes from "./routes/ai-controller";
 import openaiTestRoute from "./routes/openai-test";
+import ecosystemRoutes from "./routes/ecosystemRoutes";
+import businessFormationRoutes from "./routes/businessFormationRoutes";
 import { initializeRealtimeTranslation } from "./services/realtimeTranslation";
 
 // Validation error handling
@@ -39,6 +41,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/claude', anthropicRoutes);
   app.use('/api/ai', aiRoutes);
   app.use('/api/openai-test', openaiTestRoute);
+  app.use('/api/ecosystem', ecosystemRoutes);
+  app.use('/api/business-formation', businessFormationRoutes);
   
   // Register the new unified AI controller
   app.use('/api/v1/ai', aiControllerRoutes);

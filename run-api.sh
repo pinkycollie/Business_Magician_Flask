@@ -1,5 +1,5 @@
 #!/bin/bash
+# Run the simplified API server with Notion and Cloud Storage integration
 
-# This script runs the ultra minimal JS server
-echo "Starting ultra minimal 360 Business Magician API server..."
-node run-api.js
+# Start the server
+node api-server-notion.js

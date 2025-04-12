@@ -1,31 +1,34 @@
 {
   "version": 2,
-  "framework": "vite",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "src": "client/dist/**/*",
+      "use": "@vercel/static"
     },
     {
-      "source": "/(.*)",
-      "destination": "/"
+      "src": "api-server-notion.js",
+      "use": "@vercel/node"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "s-maxage=1, stale-while-revalidate=59"
-        }
-      ]
+      "src": "/api/(.*)",
+      "dest": "/api-server-notion.js"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|svg|ico|json))",
+      "dest": "/client/dist/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/index.html"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "VITE_API_BASE_URL": "/api"
+    "NODE_ENV": "production"
+  },
+  "regions": ["sfo1"],
+  "github": {
+    "silent": true
   }
 }
