@@ -1,135 +1,221 @@
 /**
  * Business Formation Routes
  * 
- * These routes provide a unified interface for business formation services
- * across different providers.
+ * These routes handle all API endpoints related to business formation
+ * including entity creation, state requirements, and pricing through
+ * Northwest Registered Agent.
  */
 
-import express, { Request, Response } from 'express';
-import { z } from 'zod';
-import * as businessFormationService from '../services/businessFormationService';
+import { Router, Request, Response, NextFunction } from 'express';
+import northwestService, { BusinessEntitySchema } from '../services/northwestAgentService';
+import { createBusinessFormationRecord } from '../services/notionService';
 
-const router = express.Router();
+const router = Router();
 
-// Get available business formation providers
-router.get('/providers', async (_req: Request, res: Response) => {
-  try {
-    const providers = await businessFormationService.getAvailableProviders();
-    res.json({ providers });
-  } catch (error) {
-    console.error('Error fetching providers:', error);
-    res.status(500).json({ error: 'Failed to fetch providers' });
-  }
-});
-
-// Northwest Registered Agent routes
-// --------------------------------
-
-// Check if Northwest API is configured
-router.get('/northwest/status', (_req: Request, res: Response) => {
-  try {
-    const configured = businessFormationService.isNorthwestConfigured();
-    res.json({ 
-      configured, 
-      name: 'Northwest Registered Agent',
-      message: configured ? 'API is properly configured' : 'API key is missing'
+// Middleware to check if Northwest API is configured
+const requireNorthwestApi = (req: Request, res: Response, next: NextFunction) => {
+  if (!northwestService.isNorthwestApiConfigured()) {
+    return res.status(503).json({
+      success: false,
+      error: 'Northwest Registered Agent API is not configured'
     });
-  } catch (error) {
-    console.error('Error checking Northwest configuration:', error);
-    res.status(500).json({ error: 'Failed to check Northwest configuration' });
+  }
+  next();
+};
+
+// Get supported entity types
+router.get('/entity-types', (req: Request, res: Response) => {
+  const entityTypes = Object.keys(northwestService.entityTypes).map(key => ({
+    id: key,
+    name: northwestService.entityTypes[key as keyof typeof northwestService.entityTypes],
+  }));
+  
+  res.json({
+    success: true,
+    data: entityTypes
+  });
+});
+
+// Get state requirements for entity formation
+router.get('/requirements/:stateCode/:entityType', requireNorthwestApi, async (req: Request, res: Response) => {
+  try {
+    const { stateCode, entityType } = req.params;
+    
+    const response = await northwestService.getStateRequirements(
+      entityType as keyof typeof northwestService.entityTypes, 
+      stateCode
+    );
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error fetching state requirements:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to fetch state requirements'
+    });
   }
 });
 
-// Get entity types for a state from Northwest
-router.get('/northwest/entity-types/:stateCode', async (req: Request, res: Response) => {
+// Check business name availability
+router.post('/name-availability', requireNorthwestApi, async (req: Request, res: Response) => {
   try {
-    if (!businessFormationService.isNorthwestConfigured()) {
-      return res.status(503).json({ 
-        error: 'Northwest Registered Agent API is not configured' 
+    const { companyName, entityType, stateCode } = req.body;
+    
+    if (!companyName || !entityType || !stateCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Company name, entity type, and state code are required'
       });
     }
     
+    const response = await northwestService.checkNameAvailability(
+      companyName,
+      entityType,
+      stateCode
+    );
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error checking name availability:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to check name availability'
+    });
+  }
+});
+
+// Get formation pricing
+router.post('/pricing', requireNorthwestApi, async (req: Request, res: Response) => {
+  try {
+    const { entityType, stateCode, options } = req.body;
+    
+    if (!entityType || !stateCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Entity type and state code are required'
+      });
+    }
+    
+    const response = await northwestService.getFormationPricing(
+      entityType,
+      stateCode,
+      options
+    );
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error getting formation pricing:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get formation pricing'
+    });
+  }
+});
+
+// Get registered agent services
+router.get('/registered-agent/:stateCode', requireNorthwestApi, async (req: Request, res: Response) => {
+  try {
     const { stateCode } = req.params;
-    const entityTypes = await businessFormationService.getNorthwestEntityTypes(stateCode);
-    res.json({ entityTypes });
-  } catch (error) {
-    console.error('Error fetching Northwest entity types:', error);
-    res.status(500).json({ error: 'Failed to fetch entity types' });
-  }
-});
-
-// Get state requirements from Northwest
-router.get('/northwest/states/:stateCode/requirements', async (req: Request, res: Response) => {
-  try {
-    if (!businessFormationService.isNorthwestConfigured()) {
-      return res.status(503).json({ 
-        error: 'Northwest Registered Agent API is not configured' 
+    
+    if (!stateCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'State code is required'
       });
     }
     
-    const { stateCode } = req.params;
-    const requirements = await businessFormationService.getNorthwestStateRequirements(stateCode);
-    res.json({ requirements });
-  } catch (error) {
-    console.error('Error fetching Northwest state requirements:', error);
-    res.status(500).json({ error: 'Failed to fetch state requirements' });
+    const response = await northwestService.getRegisteredAgentServices(stateCode);
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error getting registered agent services:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get registered agent services'
+    });
   }
 });
 
-// Submit a business formation to Northwest
-router.post('/northwest/formations', async (req: Request, res: Response) => {
+// Create a business entity
+router.post('/entity', requireNorthwestApi, async (req: Request, res: Response) => {
   try {
-    if (!businessFormationService.isNorthwestConfigured()) {
-      return res.status(503).json({ 
-        error: 'Northwest Registered Agent API is not configured' 
+    // Validate request body against schema
+    const entityData = BusinessEntitySchema.parse(req.body);
+    
+    // Create Notion record if Notion is configured
+    try {
+      await createBusinessFormationRecord(
+        entityData.companyName,
+        entityData.entityType,
+        entityData.stateCode,
+        'IN_PROGRESS',
+        JSON.stringify(entityData, null, 2)
+      );
+    } catch (notionError) {
+      console.warn('Failed to create Notion record:', notionError);
+      // Continue with entity creation even if Notion record fails
+    }
+    
+    // Call Northwest API to create entity
+    const response = await northwestService.createBusinessEntity(entityData);
+    
+    // Update Notion record with formation status if successful
+    if (response.success && response.data) {
+      try {
+        await createBusinessFormationRecord(
+          entityData.companyName,
+          entityData.entityType,
+          entityData.stateCode,
+          'COMPLETED',
+          `Formation ID: ${response.data.formationId}\nStatus: ${response.data.status}\nEstimated Completion: ${response.data.estimatedCompletionDate}`
+        );
+      } catch (notionError) {
+        console.warn('Failed to update Notion record:', notionError);
+      }
+    }
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error creating business entity:', error);
+    
+    // Error validation handling
+    if (error.errors) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error',
+        details: error.errors
       });
     }
     
-    // In a real implementation, we would validate the request body here
-    const formationResult = await businessFormationService.submitNorthwestBusinessFormation(req.body);
-    res.status(201).json({ formationResult });
-  } catch (error) {
-    console.error('Error submitting Northwest formation:', error);
-    res.status(500).json({ error: 'Failed to submit business formation' });
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to create business entity'
+    });
   }
 });
 
-// Get formation status from Northwest
-router.get('/northwest/formations/:formationId/status', async (req: Request, res: Response) => {
+// Get entity formation status
+router.get('/status/:formationId', requireNorthwestApi, async (req: Request, res: Response) => {
   try {
-    if (!businessFormationService.isNorthwestConfigured()) {
-      return res.status(503).json({ 
-        error: 'Northwest Registered Agent API is not configured' 
-      });
-    }
-    
     const { formationId } = req.params;
-    const status = await businessFormationService.getNorthwestFormationStatus(formationId);
-    res.json({ status });
-  } catch (error) {
-    console.error('Error fetching Northwest formation status:', error);
-    res.status(500).json({ error: 'Failed to fetch formation status' });
-  }
-});
-
-// Get registered agent services from Northwest
-router.get('/northwest/registered-agent/services', async (_req: Request, res: Response) => {
-  try {
-    if (!businessFormationService.isNorthwestConfigured()) {
-      return res.status(503).json({ 
-        error: 'Northwest Registered Agent API is not configured' 
+    
+    if (!formationId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Formation ID is required'
       });
     }
     
-    const services = await businessFormationService.getNorthwestRegisteredAgentServices();
-    res.json({ services });
-  } catch (error) {
-    console.error('Error fetching Northwest registered agent services:', error);
-    res.status(500).json({ error: 'Failed to fetch registered agent services' });
+    const response = await northwestService.getFormationStatus(formationId);
+    
+    res.json(response);
+  } catch (error: any) {
+    console.error('Error getting formation status:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to get formation status'
+    });
   }
 });
-
-// We're focusing primarily on Northwest Registered Agent for our business formation services
-// Corporate Tools routes are removed for simplicity
 
 export default router;

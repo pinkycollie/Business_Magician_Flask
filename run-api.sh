@@ -1,5 +1,6 @@
 #!/bin/bash
-# Run the simplified API server with Notion and Cloud Storage integration
 
-# Start the server
-node api-server-notion.js
+# Run the standalone API server without TypeScript overhead
+echo "Starting standalone 360 Business Magician API server..."
+echo "This version focuses only on the Northwest Agent API without Corporate Tools integration"
+node api-server.js

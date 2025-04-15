@@ -1,149 +1,206 @@
 /**
  * Business Formation API Client
- * 
- * This module provides functions to interact with the business formation API endpoints.
- * It abstracts away the API details and provides a clean interface for components.
+ * Interfaces with the Northwest Registered Agent service
  */
 
-// Using fetch directly for Vercel compatibility
-const API_BASE = '/api/business-formation';
+import { apiRequest } from "./queryClient";
 
-// Type definitions for the API responses
-export interface EntityType {
+// Entity types from Northwest
+export const entityTypes = {
+  LLC: 'LLC',
+  CORPORATION: 'Corporation',
+  NON_PROFIT: 'NonProfit',
+  BENEFIT_CORPORATION: 'BenefitCorporation',
+  PROFESSIONAL_LLC: 'ProfessionalLLC',
+  PROFESSIONAL_CORPORATION: 'ProfessionalCorporation',
+  DBA: 'DBA',
+  SERIES_LLC: 'SeriesLLC',
+} as const;
+
+export type EntityType = keyof typeof entityTypes;
+
+// API interfaces
+export interface EntityTypeInfo {
   id: string;
   name: string;
   description: string;
-  advantages: string[];
-  disadvantages: string[];
 }
 
-export interface StateRequirement {
-  id: string;
-  name: string;
-  description: string;
-  isRequired: boolean;
-  additionalFee?: number;
+export interface FormationPricing {
+  basePrice: number;
+  stateFees: number;
+  options: FormationOption[];
+  totalPrice: number;
+  currency: string;
 }
 
-export interface RegisteredAgentService {
-  id: string;
+export interface FormationOption {
   name: string;
+  price: number;
   description: string;
-  annualFee: number;
-  features: string[];
+}
+
+export interface NameAvailabilityResult {
+  available: boolean;
+  suggestions?: string[];
 }
 
 export interface FormationStatus {
-  id: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'rejected';
-  createdAt: string;
-  updatedAt: string;
-  estimatedCompletionDate?: string;
-  rejectionReason?: string;
-  documents?: { name: string; url: string }[];
+  formationId: string;
+  status: string;
+  estimatedCompletionDate: string;
+  filingNumber?: string;
+  filingDate?: string;
+  trackingUrl?: string;
 }
 
-export interface FormationRequest {
-  entityType: string;
-  stateCode: string;
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+export interface Address {
+  street1: string;
+  street2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+export interface Member {
+  firstName: string;
+  lastName: string;
+  title?: string;
+  email?: string;
+  phone?: string;
+  address?: Address;
+}
+
+export interface BusinessEntity {
   companyName: string;
-  contactInfo: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
+  entityType: EntityType;
+  stateCode: string;
+  contactEmail: string;
+  contactPhone?: string;
+  principalAddress: Address;
+  mailingAddress?: Address;
+  members?: Member[];
+  additionalOptions?: {
+    includeEIN?: boolean;
+    includeOperatingAgreement?: boolean;
+    includeRegisteredAgent?: boolean;
+    expediteFiling?: boolean;
   };
-  businessAddress: {
-    street1: string;
-    street2?: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
-  registeredAgentService?: string;
-  additionalServices?: string[];
-  paymentMethod?: string;
 }
 
-// Helper function for API requests
-const fetchAPI = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE}${endpoint}`;
-  const defaultOptions: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-  };
-
-  const response = await fetch(url, {
-    ...defaultOptions,
-    ...options,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(error.message || 'An error occurred while fetching data');
+// API client functions
+export async function getEntityTypes(): Promise<ApiResponse<{ entityTypes: EntityTypeInfo[] }>> {
+  try {
+    const response = await apiRequest('GET', '/api/formation/entity-types');
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to fetch entity types' 
+    };
   }
+}
 
-  return response.json();
-};
-
-// API functions for Northwest Registered Agent
-export const NorthwestAgentApi = {
-  /**
-   * Check if the Northwest Registered Agent API is properly configured
-   */
-  checkStatus: async () => {
-    return fetchAPI('/northwest/status');
-  },
-
-  /**
-   * Get available entity types for a specific state
-   */
-  getEntityTypes: async (stateCode: string) => {
-    return fetchAPI(`/northwest/entity-types/${stateCode}`);
-  },
-
-  /**
-   * Get state filing requirements for a specific state
-   */
-  getStateRequirements: async (stateCode: string) => {
-    return fetchAPI(`/northwest/states/${stateCode}/requirements`);
-  },
-
-  /**
-   * Submit a business formation request
-   */
-  submitBusinessFormation: async (formData: FormationRequest) => {
-    return fetchAPI('/northwest/formations', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
-  },
-
-  /**
-   * Check the status of a formation request
-   */
-  getFormationStatus: async (formationId: string) => {
-    return fetchAPI(`/northwest/formations/${formationId}/status`);
-  },
-
-  /**
-   * Get available registered agent services
-   */
-  getRegisteredAgentServices: async () => {
-    return fetchAPI('/northwest/registered-agent/services');
+export async function getStateRequirements(
+  entityType: EntityType, 
+  stateCode: string
+): Promise<ApiResponse<any>> {
+  try {
+    const response = await apiRequest(
+      'GET', 
+      `/api/formation/requirements/${stateCode}/${entityType}`
+    );
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to fetch state requirements' 
+    };
   }
-};
+}
 
-// Get available providers
-export const getAvailableProviders = async () => {
-  return fetchAPI('/providers');
-};
+export async function checkNameAvailability(
+  companyName: string,
+  entityType: EntityType,
+  stateCode: string
+): Promise<ApiResponse<NameAvailabilityResult>> {
+  try {
+    const response = await apiRequest(
+      'POST', 
+      '/api/formation/name-availability',
+      { companyName, entityType, stateCode }
+    );
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to check name availability' 
+    };
+  }
+}
 
-// Default export for convenience
-export default {
-  NorthwestAgentApi,
-  getAvailableProviders
-};
+export async function getFormationPricing(
+  entityType: EntityType,
+  stateCode: string,
+  options?: {
+    includeEIN?: boolean;
+    includeOperatingAgreement?: boolean;
+    includeRegisteredAgent?: boolean;
+    expediteFiling?: boolean;
+  }
+): Promise<ApiResponse<FormationPricing>> {
+  try {
+    const response = await apiRequest(
+      'POST', 
+      '/api/formation/pricing',
+      { entityType, stateCode, ...options }
+    );
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to get formation pricing' 
+    };
+  }
+}
+
+export async function createBusinessEntity(
+  entity: BusinessEntity
+): Promise<ApiResponse<FormationStatus>> {
+  try {
+    const response = await apiRequest(
+      'POST', 
+      '/api/formation/entity',
+      entity
+    );
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to create business entity' 
+    };
+  }
+}
+
+export async function getFormationStatus(
+  formationId: string
+): Promise<ApiResponse<FormationStatus>> {
+  try {
+    const response = await apiRequest(
+      'GET', 
+      `/api/formation/status/${formationId}`
+    );
+    return await response.json();
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Failed to get formation status' 
+    };
+  }
+}

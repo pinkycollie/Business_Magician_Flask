@@ -4,166 +4,220 @@
  */
 
 import express from 'express';
-import { createServer } from 'http';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import http from 'http';
 
-// Get current directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Check environment variables
-console.log('API Server starting...');
-console.log('AI services status:');
-console.log(`- OpenAI: ${process.env.OPENAI_API_KEY ? 'Available (key present)' : 'Not available'}`);
-console.log(`- Anthropic: ${process.env.ANTHROPIC_API_KEY ? 'Available (key present)' : 'Not available'}`);
-
-// Create Express application
+// Initialize express
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-// Simple request logger
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (req.path.startsWith("/api")) {
-      console.log(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
+// Basic health endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Ecosystem routes - simplified implementation
+app.get('/api/ecosystem/services', (req, res) => {
+  res.json({
+    services: [
+      {
+        id: 'business',
+        name: 'Business Magician', 
+        description: 'Start or grow your business with expert guidance',
+        url: process.env.BUSINESS_MAGICIAN_URL || 'https://business.360magicians.com',
+        color: 'blue'
+      },
+      {
+        id: 'job',
+        name: 'Job Magician', 
+        description: 'Find employment and advance your career',
+        url: process.env.JOB_MAGICIAN_URL || 'https://job.360magicians.com',
+        color: 'purple'
+      },
+      {
+        id: 'vr4deaf',
+        name: 'VR4Deaf', 
+        description: 'Specialized vocational rehabilitation services',
+        url: process.env.VR4DEAF_URL || 'https://vr4deaf.360magicians.com',
+        color: 'green',
+        isPilot: true
+      }
+    ]
+  });
+});
+
+// Northwest Agent API integration
+const NORTHWEST_API_BASE_URL = 'https://api.northwestregisteredagent.com/v1';
+const isNorthwestApiConfigured = () => !!process.env.NORTHWEST_API_KEY;
+
+// Entity types supported by Northwest
+const entityTypes = {
+  LLC: 'LLC',
+  CORPORATION: 'Corporation',
+  NON_PROFIT: 'NonProfit',
+  BENEFIT_CORPORATION: 'BenefitCorporation',
+  PROFESSIONAL_LLC: 'ProfessionalLLC',
+  PROFESSIONAL_CORPORATION: 'ProfessionalCorporation',
+  DBA: 'DBA',
+  SERIES_LLC: 'SeriesLLC',
+};
+
+// Basic Northwest API helper
+const getNorthwestHeaders = () => {
+  if (!isNorthwestApiConfigured()) {
+    throw new Error('NORTHWEST_API_KEY is not configured');
+  }
+  
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.NORTHWEST_API_KEY}`
+  };
+};
+
+// Northwest API status middleware
+const checkNorthwestApi = (req, res, next) => {
+  if (!isNorthwestApiConfigured()) {
+    return res.status(503).json({
+      success: false,
+      error: 'Northwest Agent API not configured',
+      message: 'Please configure NORTHWEST_API_KEY to use formation services'
+    });
+  }
+  next();
+};
+
+// Get available entity types
+app.get('/api/formation/entity-types', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      entityTypes: [
+        { id: entityTypes.LLC, name: 'Limited Liability Company', description: 'Combines liability protection with tax flexibility' },
+        { id: entityTypes.CORPORATION, name: 'Corporation', description: 'Separate legal entity owned by shareholders' },
+        { id: entityTypes.NON_PROFIT, name: 'Non-Profit', description: 'Organization for charitable, educational, or public purposes' },
+        { id: entityTypes.BENEFIT_CORPORATION, name: 'Benefit Corporation', description: 'For-profit entity with public benefit purpose' },
+        { id: entityTypes.PROFESSIONAL_LLC, name: 'Professional LLC', description: 'For licensed professionals like doctors, lawyers, etc.' },
+        { id: entityTypes.PROFESSIONAL_CORPORATION, name: 'Professional Corporation', description: 'Corporation for licensed professionals' },
+        { id: entityTypes.DBA, name: 'DBA (Doing Business As)', description: 'Business name different from legal name' },
+        { id: entityTypes.SERIES_LLC, name: 'Series LLC', description: 'Multiple protected "cells" within one LLC' }
+      ]
     }
   });
-  next();
 });
 
-// API ENDPOINTS
-// Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", mode: "api-server" });
-});
-
-// AI services status 
-app.get("/api/ai-status", (_req, res) => {
+// Get formation status (mock API for development)
+app.get('/api/formation/status/:formationId', checkNorthwestApi, (req, res) => {
+  const { formationId } = req.params;
+  
+  // Simplified mock response
   res.json({
-    openai: !!process.env.OPENAI_API_KEY,
-    anthropic: !!process.env.ANTHROPIC_API_KEY,
-    environment: process.env.NODE_ENV || "development"
+    success: true,
+    data: {
+      formationId: formationId,
+      status: 'IN_PROGRESS',
+      estimatedCompletionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    }
   });
 });
 
-// Business tools endpoint
-app.get("/api/business-tools", (_req, res) => {
-  res.json({
-    tools: [
-      { 
-        id: "business-idea-generator",
-        name: "Business Idea Generator",
-        description: "Generate custom business ideas based on your interests and skills"
-      },
-      { 
-        id: "financial-calculator",
-        name: "Financial Calculator",
-        description: "Calculate startup costs and project financial needs"
-      },
-      { 
-        id: "market-analyzer",
-        name: "Market Analysis Tool",
-        description: "Research your target market and competition"
-      },
-      { 
-        id: "business-plan-writer",
-        name: "Business Plan Writer",
-        description: "Create a professional business plan with AI assistance"
-      },
-      {
-        id: "asl-business-guidance",
-        name: "ASL Business Guidance",
-        description: "Video resources explaining business concepts in American Sign Language"
-      }
-    ]
-  });
-});
-
-// Business Phases (lifecycle)
-app.get("/api/business-phases", (_req, res) => {
-  res.json({
-    phases: [
-      {
-        id: "idea",
-        name: "Idea Phase",
-        description: "Explore and validate business ideas"
-      },
-      {
-        id: "build",
-        name: "Build Phase",
-        description: "Create your business foundation and structure"
-      },
-      {
-        id: "grow",
-        name: "Grow Phase",
-        description: "Expand your customer base and operations"
-      },
-      {
-        id: "manage",
-        name: "Manage Phase",
-        description: "Optimize business operations and sustainability"
-      }
-    ]
-  });
-});
-
-// BUSINESS IDEA GENERATOR
+// Function to generate basic business ideas - standalone implementation
 function generateBasicBusinessIdea(interests = ['technology'], marketInfo = 'general', constraints = []) {
-  // Simple placeholder to generate ideas without AI integration
-  const ideaTemplates = [
-    { name: "Mobile App for Deaf Entrepreneurs", description: "A specialized mobile app that provides business guidance, resources and networking opportunities specifically designed for deaf entrepreneurs." },
-    { name: "ASL Business Training Platform", description: "Online platform offering business courses and certifications in American Sign Language." },
-    { name: "Accessibility Consulting Service", description: "Consulting service that helps businesses improve accessibility for deaf and hard-of-hearing customers and employees." },
-    { name: "Deaf-Friendly Co-working Space", description: "Co-working space designed with deaf entrepreneurs in mind, featuring visual alerts, specialized meeting rooms, and sign language interpreters." },
-    { name: "ASL Interpretation Booking Platform", description: "Platform connecting businesses with qualified ASL interpreters for meetings, events, and customer service." }
+  // Simple implementation without AI
+  const ideas = [
+    {
+      title: "ASL Training Services",
+      description: "Create a business providing specialized ASL training for corporate environments, focusing on workplace communication and inclusion.",
+      viability: "High",
+      startupCosts: "Low to Medium",
+      targetMarket: "Corporations, educational institutions, government agencies",
+      revenueModel: "Training programs, subscription services, certification courses"
+    },
+    {
+      title: "Accessible Events Planning",
+      description: "Specialized event planning service focused on accessibility for deaf and hard-of-hearing attendees, including real-time captioning, ASL interpreters, and visual cuing systems.",
+      viability: "Medium to High",
+      startupCosts: "Low",
+      targetMarket: "Conference organizers, corporations, universities, community organizations",
+      revenueModel: "Service fees, consulting, accessibility technology rental"
+    },
+    {
+      title: "Assistive Technology Consulting",
+      description: "Consulting business helping organizations implement and optimize assistive technologies for deaf and hard-of-hearing employees and customers.",
+      viability: "High",
+      startupCosts: "Low",
+      targetMarket: "Businesses, educational institutions, healthcare facilities",
+      revenueModel: "Consulting fees, implementation services, ongoing support contracts"
+    }
   ];
-
-  // Select random idea from templates as a placeholder
-  const randomIndex = Math.floor(Math.random() * ideaTemplates.length);
+  
   return {
-    ...ideaTemplates[randomIndex],
-    generatedAt: new Date().toISOString(),
-    interests: interests,
-    viabilityScore: Math.floor(Math.random() * 100),
-    implementationComplexity: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)]
+    success: true,
+    data: {
+      ideas: ideas,
+      interests: interests,
+      marketContext: marketInfo,
+      constraints: constraints
+    }
   };
 }
 
-// Business idea generation endpoint
-app.post("/api/generate-business-idea", (req, res) => {
+// Business ideas endpoint
+app.post('/api/ecosystem/business-ideas', (req, res) => {
   const { interests, marketInfo, constraints } = req.body;
-  const idea = generateBasicBusinessIdea(
+  
+  // Generate ideas using the local function
+  const response = generateBasicBusinessIdea(
     interests || ['technology'], 
-    marketInfo || 'general', 
+    marketInfo || 'general',
     constraints || []
   );
   
-  res.json({ success: true, idea });
+  res.json(response);
 });
 
-// Static file serving - client application
-app.use(express.static(path.join(__dirname, 'client/dist')));
-
-// SPA fallback
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+// Business tool recommendations
+app.get('/api/tools', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      tools: [
+        { 
+          id: "business-plan-creator",
+          name: "Business Plan Creator",
+          description: "Create a professional business plan with our step-by-step guide",
+          url: "/tools/business-plan"
+        },
+        { 
+          id: "market-research",
+          name: "Market Research Tool",
+          description: "Analyze your market and competition using our data-driven insights",
+          url: "/tools/market-research"
+        },
+        { 
+          id: "startup-calculator",
+          name: "Startup Cost Calculator",
+          description: "Estimate your startup costs and financial needs",
+          url: "/tools/cost-calculator"
+        }
+      ]
+    }
+  });
 });
 
-// Start server
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ 
+    success: false, 
+    error: 'Internal server error'
+  });
+});
+
+// Start the server
 const port = process.env.PORT || 5000;
-const server = createServer(app);
+const server = http.createServer(app);
 
-server.listen({
-  port,
-  host: "0.0.0.0",
-}, () => {
-  console.log(`360 Business Magician API Server running on port ${port}`);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Business Magician API Server running on port ${port}`);
 });
-
-export default app;

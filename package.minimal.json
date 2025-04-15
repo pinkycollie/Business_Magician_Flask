@@ -1,0 +1,20 @@
+{
+  "name": "rest-express",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx server/minimal-server.ts",
+    "build": "vite build && esbuild server/minimal-server.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "NODE_ENV=production node dist/minimal-server.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "node scripts/db-setup.js",
+    "db:check": "drizzle-kit check:pg",
+    "lint": "echo 'Add your linting configuration here'",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'Add your testing command here'"
+  }
+}
