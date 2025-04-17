@@ -41,6 +41,42 @@ app.get('/api/ecosystem/services', (req, res) => {
   });
 });
 
+// Basic profile routes
+app.get('/api/profile', (req, res) => {
+  res.json({
+    id: 1,
+    username: 'entrepreneur1',
+    name: 'Alex Johnson',
+    email: 'alex@example.com',
+    isDeaf: true,
+    bio: 'Deaf entrepreneur working on my first tech startup. Focused on accessibility solutions.',
+    location: 'Portland, OR',
+    company: 'AccessFirst',
+    website: 'https://accessfirst.example.com',
+    avatarUrl: '',
+    joinedDate: '2023-06-15',
+    businessPhase: 'idea' // idea, build, grow, manage
+  });
+});
+
+app.get('/api/profile/:username', (req, res) => {
+  const { username } = req.params;
+  res.json({
+    id: 1,
+    username,
+    name: 'Alex Johnson',
+    email: 'alex@example.com',
+    isDeaf: true,
+    bio: 'Deaf entrepreneur working on my first tech startup. Focused on accessibility solutions.',
+    location: 'Portland, OR',
+    company: 'AccessFirst',
+    website: 'https://accessfirst.example.com',
+    avatarUrl: '',
+    joinedDate: '2023-06-15',
+    businessPhase: 'idea'
+  });
+});
+
 // Simple error handler
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

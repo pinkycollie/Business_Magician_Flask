@@ -9,7 +9,8 @@ import {
   Globe,
   Headphones,
   Users,
-  Settings
+  Settings,
+  UserIcon
 } from 'lucide-react';
 
 // Import our components
@@ -17,6 +18,7 @@ import AIBusinessAnalytics from '@/components/analytics/AIBusinessAnalytics';
 import VR4DeafDashboard from '@/components/vr4deaf/VR4DeafDashboard';
 import JobSupportDashboard from '@/components/vr4deaf/JobSupportDashboard';
 import StartupTeamBuilder from '@/components/vr4deaf/StartupTeamBuilder';
+import ProfilePage from '@/pages/profile-page';
 
 export default function App() {
   const [navCollapsed, setNavCollapsed] = useState(false);
@@ -75,6 +77,13 @@ export default function App() {
               active={location === '/team-builder'} 
             />
             <NavItem 
+              to="/profile" 
+              icon={<UserIcon className="h-5 w-5" />} 
+              text="My Profile" 
+              collapsed={navCollapsed} 
+              active={location === '/profile' || location.includes('/profile/')} 
+            />
+            <NavItem 
               to="/settings" 
               icon={<Settings className="h-5 w-5" />} 
               text="Settings" 
@@ -112,6 +121,8 @@ export default function App() {
           <Route path="/job-support" component={JobSupportDashboard} />
           <Route path="/team-builder" component={StartupTeamBuilder} />
           <Route path="/settings" component={SettingsScreen} />
+          <Route path="/profile" component={ProfilePage} />
+          <Route path="/profile/:username" component={ProfilePage} />
           <Route component={NotFoundScreen} />
         </Switch>
       </main>

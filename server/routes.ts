@@ -23,6 +23,7 @@ import openaiTestRoute from "./routes/openai-test";
 import ecosystemRoutes from "./routes/ecosystemRoutes";
 import businessFormationRoutes from "./routes/businessFormationRoutes";
 import startupTeamBuilderRoutes from "./routes/startupTeamBuilderRoutes";
+import profileRoutes from "./routes/profileRoutes";
 import { initializeRealtimeTranslation } from "./services/realtimeTranslation";
 
 // Validation error handling
@@ -45,6 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/ecosystem', ecosystemRoutes);
   app.use('/api/business-formation', businessFormationRoutes);
   app.use('/api/startup-team', startupTeamBuilderRoutes);
+  app.use('/api/profile', profileRoutes);
   
   // Register the new unified AI controller
   app.use('/api/v1/ai', aiControllerRoutes);
