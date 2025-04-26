@@ -14,7 +14,8 @@ import {
   BookOpen,
   Map,
   Library,
-  BookMarked
+  BookMarked,
+  Building
 } from 'lucide-react';
 
 // Import our components
@@ -26,6 +27,13 @@ import ProfilePage from '@/pages/profile-page';
 import TechLeadershipResources from '@/components/resources/TechLeadershipResources';
 import JourneyTrackerPage from '@/pages/journey-tracker-page';
 import ResourceLibraryPage from '@/pages/resource-library-page';
+
+// Business Pathway Pages
+import BusinessPathwayPage from '@/pages/pathways/business';
+import BusinessIdeaPage from '@/pages/pathways/business/idea';
+import BusinessBuildPage from '@/pages/pathways/business/build';
+import BusinessGrowPage from '@/pages/pathways/business/grow';
+import BusinessManagePage from '@/pages/pathways/business/manage';
 
 export default function App() {
   const [navCollapsed, setNavCollapsed] = useState(false);
@@ -55,6 +63,13 @@ export default function App() {
         
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
+            <NavItem 
+              to="/pathways/business" 
+              icon={<Building className="h-5 w-5" />} 
+              text="Business Pathway" 
+              collapsed={navCollapsed} 
+              active={location.includes('/pathways/business')} 
+            />
             <NavItem 
               to="/analytics" 
               icon={<BarChart className="h-5 w-5" />} 
@@ -144,6 +159,11 @@ export default function App() {
       <main className="flex-1 bg-slate-50">
         <Switch>
           <Route path="/" component={HomeScreen} />
+          <Route path="/pathways/business" component={BusinessPathwayPage} />
+          <Route path="/pathways/business/idea" component={BusinessIdeaPage} />
+          <Route path="/pathways/business/build" component={BusinessBuildPage} />
+          <Route path="/pathways/business/grow" component={BusinessGrowPage} />
+          <Route path="/pathways/business/manage" component={BusinessManagePage} />
           <Route path="/analytics" component={AIBusinessAnalytics} />
           <Route path="/vr4deaf" component={VR4DeafDashboard} />
           <Route path="/job-support" component={JobSupportDashboard} />
@@ -208,12 +228,20 @@ function HomeScreen() {
             Create, build, and grow your business with deaf-first resources, AI-powered guidance, 
             and accessibility-focused tools.
           </p>
-          <Link href="/analytics">
-            <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
-              Explore Business Analytics
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </a>
-          </Link>
+          <div className="flex flex-col gap-2">
+            <Link href="/pathways/business">
+              <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
+                Explore Business Pathway
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </a>
+            </Link>
+            <Link href="/analytics">
+              <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
+                View Business Analytics
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </a>
+            </Link>
+          </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200">

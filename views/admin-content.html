@@ -1,0 +1,420 @@
+<div>
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">Content Library</h2>
+    <p class="text-gray-600">Manage all content resources for the 360 Business Magician platform</p>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex-grow max-w-md mb-4 sm:mb-0">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Search content...">
+      </div>
+    </div>
+    <div class="flex space-x-3">
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
+          Filter
+        </button>
+        <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+          <div class="py-1" role="none">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">All Content</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Articles</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Videos</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Guides</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Templates</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Infographics</a>
+          </div>
+          <div class="py-1" role="none">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Idea Phase</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Build Phase</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Grow Phase</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Phase</a>
+          </div>
+        </div>
+      </div>
+      <button hx-get="/admin/content/upload" hx-trigger="click" hx-target="#main-content" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Upload Content
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Content Item 1 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=Business+Plan+Template&background=6366f1&color=fff&size=600" alt="Business Plan Template" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Template
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Business Plan Template</h3>
+            <p class="mt-1 text-sm text-gray-500">Comprehensive business plan template with ASL video guidance</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 15, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>2 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Build Phase
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Item 2 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=Marketing+Strategy+Guide&background=22c55e&color=fff&size=600" alt="Marketing Strategy Guide" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Guide
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Marketing Strategy Guide</h3>
+            <p class="mt-1 text-sm text-gray-500">Comprehensive marketing guidance for deaf entrepreneurs</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 18, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>3.5 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            Grow Phase
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Item 3 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=ASL+Business+Glossary&background=ef4444&color=fff&size=600" alt="ASL Business Glossary" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            Video
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">ASL Business Glossary</h3>
+            <p class="mt-1 text-sm text-gray-500">Common business terminology in American Sign Language</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 10, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <span>18 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            All Phases
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Item 4 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=Financial+Forecasting+Tool&background=3b82f6&color=fff&size=600" alt="Financial Forecasting Tool" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+            Tool
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Financial Forecasting Tool</h3>
+            <p class="mt-1 text-sm text-gray-500">Interactive financial modeling tool with ASL instructions</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 20, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>4.2 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Build Phase
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Item 5 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=Accessibility+Checklist&background=8b5cf6&color=fff&size=600" alt="Business Accessibility Checklist" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            Checklist
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Business Accessibility Checklist</h3>
+            <p class="mt-1 text-sm text-gray-500">Comprehensive accessibility checklist for deaf-owned businesses</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 12, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>1.5 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+            All Phases
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Item 6 -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="relative h-48 bg-gray-200">
+        <img src="https://ui-avatars.com/api/?name=Market+Research+Template&background=f59e0b&color=fff&size=600" alt="Market Research Template" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute top-2 right-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            Template
+          </span>
+        </div>
+      </div>
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Market Research Template</h3>
+            <p class="mt-1 text-sm text-gray-500">Comprehensive market analysis template with ASL guidance</p>
+          </div>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="text-gray-500 hover:text-gray-700">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+              </svg>
+            </button>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+              <div class="py-1" role="none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Download</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preview</a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm text-gray-500">
+          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span>Updated on Apr 8, 2023</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>2.8 MB</span>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+            Idea Phase
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 rounded-lg shadow sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+      <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        Previous
+      </a>
+      <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+        Next
+      </a>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Showing <span class="font-medium">1</span> to <span class="font-medium">6</span> of <span class="font-medium">24</span> results
+        </p>
+      </div>
+      <div>
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <span class="sr-only">Previous</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 hover:bg-gray-50">
+            1
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            2
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            3
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            4
+          </a>
+          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <span class="sr-only">Next</span>
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

@@ -166,7 +166,7 @@ app.use((req, res, next) => {
 });
 
 // Start server
-const port = 5000;
+const port = parseInt(env.PORT || "5000", 10);
 const server = createServer(app);
 
 server.listen({
@@ -175,4 +175,5 @@ server.listen({
   reusePort: true,
 }, () => {
   console.log(`Optimized server running on port ${port} (${app.get("env")} mode)`);
+  console.log(`Note: In deployment, external port mapping is port 80 -> ${port}`);
 });

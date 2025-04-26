@@ -1,0 +1,525 @@
+<div class="bg-white shadow rounded-lg overflow-hidden" 
+     hx-ext="ws" 
+     ws-connect="/ws/chat">
+  
+  <!-- Chat header -->
+  <div class="flex justify-between items-center p-4 border-b border-gray-200">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900">Team Chat</h2>
+      <p class="text-sm text-gray-500">Business Magician Team</p>
+    </div>
+    <div>
+      <button class="btn btn-sm bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded px-2 py-1 text-sm flex items-center"
+              hx-get="/collaboration/chat/settings"
+              hx-target="#modal-container">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Settings
+      </button>
+    </div>
+  </div>
+  
+  <!-- Chat interface (two-column layout) -->
+  <div class="flex h-[600px]">
+    <!-- Channels/Direct Messages sidebar -->
+    <div class="w-64 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
+      <!-- Team Members Online -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Team Members</h3>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <div class="relative mr-2">
+              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Alex+Johnson&background=6366f1&color=fff" alt="">
+              <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 border-2 border-white"></span>
+            </div>
+            <span class="text-sm font-medium text-gray-900">You</span>
+          </li>
+          <li class="flex items-center">
+            <div class="relative mr-2">
+              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1&color=fff" alt="">
+              <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 border-2 border-white"></span>
+            </div>
+            <span class="text-sm font-medium text-gray-900">Sarah Chen</span>
+          </li>
+          <li class="flex items-center">
+            <div class="relative mr-2">
+              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Marcus+Johnson&background=8b5cf6&color=fff" alt="">
+              <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-400 border-2 border-white"></span>
+            </div>
+            <span class="text-sm font-medium text-gray-900">Marcus Johnson</span>
+          </li>
+          <li class="flex items-center">
+            <div class="relative mr-2">
+              <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Aisha+Patel&background=d946ef&color=fff" alt="">
+              <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-yellow-400 border-2 border-white"></span>
+            </div>
+            <span class="text-sm font-medium text-gray-900">Aisha Patel</span>
+            <span class="ml-auto text-xs text-gray-500">Away</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Channels -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Channels</h3>
+          <button class="text-gray-400 hover:text-gray-500"
+                  hx-get="/collaboration/chat/new-channel"
+                  hx-target="#modal-container"
+                  title="New Channel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md bg-indigo-50 text-indigo-700 font-medium text-sm"
+                    hx-get="/collaboration/chat/channels/general"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              # general
+            </button>
+          </li>
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/channels/business-plan"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              # business-plan
+              <span class="ml-auto bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">3</span>
+            </button>
+          </li>
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/channels/marketing"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              # marketing
+            </button>
+          </li>
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/channels/product-development"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              # product-development
+            </button>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Direct Messages -->
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Direct Messages</h3>
+          <button class="text-gray-400 hover:text-gray-500"
+                  hx-get="/collaboration/chat/new-dm"
+                  hx-target="#modal-container"
+                  title="New Message">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/dm/sarah-chen"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              <div class="relative mr-2 flex-shrink-0">
+                <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1&color=fff" alt="">
+                <span class="absolute bottom-0 right-0 block h-1.5 w-1.5 rounded-full bg-green-400 border-2 border-white"></span>
+              </div>
+              Sarah Chen
+            </button>
+          </li>
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/dm/marcus-johnson"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              <div class="relative mr-2 flex-shrink-0">
+                <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Marcus+Johnson&background=8b5cf6&color=fff" alt="">
+                <span class="absolute bottom-0 right-0 block h-1.5 w-1.5 rounded-full bg-green-400 border-2 border-white"></span>
+              </div>
+              Marcus Johnson
+              <span class="ml-auto bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">1</span>
+            </button>
+          </li>
+          <li>
+            <button class="flex items-center w-full text-left px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-700 text-sm"
+                    hx-get="/collaboration/chat/dm/aisha-patel"
+                    hx-target="#chat-messages-container"
+                    hx-swap="innerHTML">
+              <div class="relative mr-2 flex-shrink-0">
+                <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Aisha+Patel&background=d946ef&color=fff" alt="">
+                <span class="absolute bottom-0 right-0 block h-1.5 w-1.5 rounded-full bg-yellow-400 border-2 border-white"></span>
+              </div>
+              Aisha Patel
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Chat messages area -->
+    <div class="flex-1 flex flex-col">
+      <!-- Message thread container - updated via HTMX -->
+      <div id="chat-messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Messages will be loaded here via HTMX, default loading general channel -->
+        <div class="text-center text-sm text-gray-500 my-4">
+          <span>Today</span>
+        </div>
+        
+        <!-- Example message from team member -->
+        <div class="flex items-start group">
+          <img class="mr-3 h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1&color=fff" alt="">
+          <div class="flex-1">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-900">Sarah Chen</span>
+              <span class="ml-2 text-xs text-gray-500">9:32 AM</span>
+              <div class="opacity-0 group-hover:opacity-100 ml-2 flex space-x-2">
+                <button class="text-gray-400 hover:text-gray-500" title="React"
+                        hx-get="/collaboration/chat/reactions"
+                        hx-target="#modal-container">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <button class="text-gray-400 hover:text-gray-500" title="Thread"
+                        hx-get="/collaboration/chat/thread/1"
+                        hx-target="#chat-messages-container"
+                        hx-swap="innerHTML">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="mt-1 text-gray-700">
+              <p>Hi everyone! I've just uploaded the latest market research findings to our shared documents.</p>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <button class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">
+                👍 2
+              </button>
+              <button class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">
+                🙏 1
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Example message with file attachment -->
+        <div class="flex items-start group">
+          <img class="mr-3 h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1&color=fff" alt="">
+          <div class="flex-1">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-900">Sarah Chen</span>
+              <span class="ml-2 text-xs text-gray-500">9:33 AM</span>
+              <div class="opacity-0 group-hover:opacity-100 ml-2 flex space-x-2">
+                <button class="text-gray-400 hover:text-gray-500" title="React"
+                        hx-get="/collaboration/chat/reactions"
+                        hx-target="#modal-container">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <button class="text-gray-400 hover:text-gray-500" title="Thread"
+                        hx-get="/collaboration/chat/thread/2"
+                        hx-target="#chat-messages-container"
+                        hx-swap="innerHTML">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="mt-1 text-gray-700">
+              <p>Here's the PDF:</p>
+            </div>
+            <div class="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center max-w-md">
+              <div class="mr-3 p-2 bg-red-100 rounded-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-medium text-gray-900 truncate">Market_Research_Q2_2023.pdf</h4>
+                <p class="text-xs text-gray-500">2.4 MB • PDF</p>
+              </div>
+              <button class="ml-2 p-1 text-gray-400 hover:text-gray-500"
+                      hx-get="/collaboration/chat/download-file/123"
+                      hx-swap="none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Example message with ASL video -->
+        <div class="flex items-start group">
+          <img class="mr-3 h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Marcus+Johnson&background=8b5cf6&color=fff" alt="">
+          <div class="flex-1">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-900">Marcus Johnson</span>
+              <span class="ml-2 text-xs text-gray-500">9:36 AM</span>
+              <div class="opacity-0 group-hover:opacity-100 ml-2 flex space-x-2">
+                <button class="text-gray-400 hover:text-gray-500" title="React"
+                        hx-get="/collaboration/chat/reactions"
+                        hx-target="#modal-container">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <button class="text-gray-400 hover:text-gray-500" title="Thread"
+                        hx-get="/collaboration/chat/thread/3"
+                        hx-target="#chat-messages-container"
+                        hx-swap="innerHTML">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="mt-1 text-gray-700">
+              <p>Thanks for sharing! I have some comments in ASL:</p>
+            </div>
+            <div class="mt-2 max-w-md">
+              <div class="relative bg-black rounded-lg overflow-hidden" style="aspect-ratio: 16/9;">
+                <video class="w-full h-full" controls autoplay muted loop>
+                  <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+                <div class="absolute top-2 right-2 bg-black bg-opacity-60 p-1 rounded">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-1 p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700">
+                <p><strong>Auto-Transcription:</strong> I think the findings are interesting. We should focus on the accessibility market segment because it has strong growth potential and aligns with our mission.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Example of your own message -->
+        <div class="flex items-start justify-end group">
+          <div class="flex-1 max-w-md flex flex-col items-end">
+            <div class="flex items-center">
+              <div class="opacity-0 group-hover:opacity-100 mr-2 flex space-x-2">
+                <button class="text-gray-400 hover:text-gray-500" title="Edit"
+                        hx-get="/collaboration/chat/edit/4"
+                        hx-target="#modal-container">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button class="text-gray-400 hover:text-gray-500" title="Delete"
+                        hx-delete="/collaboration/chat/message/4"
+                        hx-swap="none"
+                        hx-confirm="Are you sure you want to delete this message?">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+              <span class="mr-2 text-xs text-gray-500">9:40 AM</span>
+              <span class="font-medium text-gray-900">You</span>
+            </div>
+            <div class="mt-1 bg-indigo-100 text-indigo-800 p-3 rounded-lg text-right max-w-md">
+              <p>Great points, Marcus! I agree we should focus on accessibility. Let's schedule a meeting to discuss the implementation details.</p>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 hover:bg-gray-200 text-gray-800">
+                👍 3
+              </span>
+            </div>
+          </div>
+          <img class="ml-3 h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Alex+Johnson&background=6366f1&color=fff" alt="">
+        </div>
+        
+        <!-- "X is typing" indicator -->
+        <div class="flex items-center text-gray-500 text-sm" 
+             id="typing-indicator" 
+             hx-ext="ws" 
+             ws-connect="/ws/typing">
+          <div class="flex space-x-1 mr-2">
+            <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+            <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+            <div class="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+          </div>
+          <span>Sarah is typing...</span>
+        </div>
+      </div>
+      
+      <!-- Message input area -->
+      <div class="p-4 border-t border-gray-200 bg-white">
+        <form class="flex space-x-3" 
+              hx-post="/collaboration/chat/send"
+              hx-swap="none"
+              hx-trigger="submit"
+              hx-on::after-request="this.reset()"
+              _="on keydown[key=='Enter' && !event.shiftKey] from #message-input
+                 halt the event
+                 if #message-input.value.trim() != ''
+                   trigger submit">
+          <div class="flex-1 relative">
+            <!-- Message input -->
+            <textarea 
+              id="message-input"
+              name="message"
+              rows="1" 
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Type your message or record ASL video..."
+              _="on input
+                set my style.height to 'auto'
+                set my style.height to (this.scrollHeight > 150 ? '150px' : this.scrollHeight + 'px')
+                if my value.trim() != ''
+                  htmx.ajax('POST', '/collaboration/chat/typing', {})">
+            </textarea>
+            
+            <!-- Message actions -->
+            <div class="absolute right-2 bottom-2 flex space-x-2">
+              <button type="button" 
+                      class="text-gray-400 hover:text-gray-500"
+                      hx-get="/collaboration/chat/emoji-picker"
+                      hx-target="#emoji-picker-container"
+                      hx-swap="innerHTML"
+                      title="Add emoji">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <button type="button" 
+                      class="text-gray-400 hover:text-gray-500"
+                      hx-get="/collaboration/chat/upload-file"
+                      hx-target="#modal-container"
+                      title="Attach file">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              </button>
+              <button type="button" 
+                      class="text-gray-400 hover:text-gray-500"
+                      hx-get="/collaboration/chat/record-asl"
+                      hx-target="#modal-container"
+                      title="Record ASL video">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <button type="button" 
+                      class="text-gray-400 hover:text-gray-500"
+                      hx-get="/collaboration/chat/gif-picker"
+                      hx-target="#modal-container"
+                      title="Add GIF">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Send button -->
+          <button type="submit" 
+                  class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </form>
+        
+        <!-- Emoji picker container -->
+        <div id="emoji-picker-container" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- WebSocket event handling -->
+  <div id="ws-events" class="hidden">
+    <!-- This will be used to handle WebSocket events -->
+  </div>
+</div>
+
+<!-- Script for Chat Functionality -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-resize text area
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+      messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight > 150 ? '150px' : this.scrollHeight + 'px');
+      });
+    }
+    
+    // Scroll to bottom of chat
+    const chatContainer = document.getElementById('chat-messages-container');
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Simulate WebSocket message for new chat message
+    setTimeout(() => {
+      // Handle new message via WebSocket
+      const wsMessageEvent = new CustomEvent('htmx:wsAfterMessage', {
+        detail: {
+          message: {
+            type: 'notification',
+            content: 'New message from Sarah in #general',
+            messageType: 'info'
+          }
+        }
+      });
+      
+      document.body.dispatchEvent(wsMessageEvent);
+      
+      // Add a new message to the chat (in a real implementation, this would come from the WebSocket)
+      const newMessage = document.createElement('div');
+      newMessage.className = 'flex items-start group';
+      newMessage.innerHTML = `
+        <img class="mr-3 h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Sarah+Chen&background=6366f1&color=fff" alt="">
+        <div class="flex-1">
+          <div class="flex items-center">
+            <span class="font-medium text-gray-900">Sarah Chen</span>
+            <span class="ml-2 text-xs text-gray-500">Now</span>
+          </div>
+          <div class="mt-1 text-gray-700">
+            <p>Let's schedule that meeting for tomorrow at 10:00 AM. Does that work for everyone?</p>
+          </div>
+        </div>
+      `;
+      
+      // Animate the new message
+      newMessage.style.opacity = '0';
+      newMessage.style.transform = 'translateY(10px)';
+      newMessage.style.transition = 'opacity 300ms, transform 300ms';
+      
+      // Add to chat and scroll to it
+      if (chatContainer) {
+        // Remove typing indicator if present
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+          typingIndicator.style.display = 'none';
+        }
+        
+        chatContainer.appendChild(newMessage);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Animate in
+        setTimeout(() => {
+          newMessage.style.opacity = '1';
+          newMessage.style.transform = 'translateY(0)';
+        }, 10);
+      }
+    }, 5000);
+  });
+</script>

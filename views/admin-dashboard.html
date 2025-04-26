@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - 360 Business Magician</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js" defer></script>
+  <style>
+    .sidebar {
+      width: 250px;
+    }
+    .content {
+      margin-left: 250px;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: relative;
+      }
+      .content {
+        margin-left: 0;
+      }
+    }
+    .tab-active {
+      border-left: 4px solid #6366f1;
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+  <div x-data="{ sidebarOpen: false }">
+    <!-- Navigation -->
+    <header class="bg-white border-b border-gray-200 fixed w-full z-10">
+      <div class="flex items-center justify-between px-4 py-3">
+        <div class="flex items-center">
+          <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-gray-800 mr-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <span class="text-xl font-bold text-indigo-600">360 Business Magician</span>
+        </div>
+        <div class="flex items-center">
+          <a href="/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600">Exit Admin</a>
+          <div class="ml-3 relative" x-data="{ open: false }">
+            <div>
+              <button @click="open = !open" class="flex items-center text-sm rounded-full focus:outline-none">
+                <span class="sr-only">Open user menu</span>
+                <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin">
+              </button>
+            </div>
+            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div class="py-1 rounded-md bg-white shadow-xs">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" class="bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-30 w-64 transition duration-300 transform md:translate-x-0 md:static md:inset-auto md:h-auto overflow-y-auto sidebar pt-16">
+      <nav class="mt-5">
+        <div class="px-2">
+          <div class="mb-2">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">General</h3>
+            <div class="mt-1">
+              <a hx-get="/admin/dashboard" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md tab-active">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Dashboard
+              </a>
+            </div>
+          </div>
+          <div class="mb-2">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Management</h3>
+            <div class="mt-1">
+              <a hx-get="/admin/partners" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Partners
+              </a>
+              <a hx-get="/admin/content" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                Content Library
+              </a>
+              <a hx-get="/admin/asl-videos" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                ASL Videos
+              </a>
+            </div>
+          </div>
+          <div class="mb-2">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">AI Tools</h3>
+            <div class="mt-1">
+              <a hx-get="/admin/social-media" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                </svg>
+                Social Media Generator
+              </a>
+              <a hx-get="/admin/ai-tools" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                AI Hub Configuration
+              </a>
+            </div>
+          </div>
+          <div class="mb-2">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">System</h3>
+            <div class="mt-1">
+              <a hx-get="/admin/settings" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Settings
+              </a>
+              <a hx-get="/admin/users" hx-trigger="click" hx-target="#main-content" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-100">
+                <svg class="text-gray-500 mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                User Management
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="pt-16 md:ml-64">
+      <main class="p-6" id="main-content">
+        <!-- Dashboard Overview (Default content) -->
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
+          <p class="text-gray-600">Welcome to the 360 Business Magician Admin Dashboard</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-indigo-100 text-indigo-500 mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">Partners</p>
+                <p class="text-2xl font-bold text-gray-900">12</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">ASL Videos</p>
+                <p class="text-2xl font-bold text-gray-900">48</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">AI Tools</p>
+                <p class="text-2xl font-bold text-gray-900">6</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-500 text-sm">Total Users</p>
+                <p class="text-2xl font-bold text-gray-900">267</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow mb-6">
+          <div class="border-b border-gray-200 px-6 py-4">
+            <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div class="p-6">
+            <ul class="divide-y divide-gray-200">
+              <li class="py-3">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="">
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Admin added new partner: LegalShield</p>
+                    <p class="text-sm text-gray-500">30 minutes ago</p>
+                  </div>
+                </div>
+              </li>
+              <li class="py-3">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=JD&background=22c55e&color=fff" alt="">
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">John Doe uploaded new ASL video</p>
+                    <p class="text-sm text-gray-500">2 hours ago</p>
+                  </div>
+                </div>
+              </li>
+              <li class="py-3">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=SM&background=ef4444&color=fff" alt="">
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Sarah Miller generated new social media content</p>
+                    <p class="text-sm text-gray-500">Yesterday</p>
+                  </div>
+                </div>
+              </li>
+              <li class="py-3">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=RJ&background=3b82f6&color=fff" alt="">
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Robert Johnson updated AI Hub configuration</p>
+                    <p class="text-sm text-gray-500">2 days ago</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-lg shadow">
+            <div class="border-b border-gray-200 px-6 py-4">
+              <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <a hx-get="/admin/partners/new" hx-trigger="click" hx-target="#main-content" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg p-4 text-center">
+                  <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Add Partner
+                </a>
+                <a hx-get="/admin/content/upload" hx-trigger="click" hx-target="#main-content" class="bg-green-100 hover:bg-green-200 text-green-700 rounded-lg p-4 text-center">
+                  <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                  </svg>
+                  Upload Content
+                </a>
+                <a hx-get="/admin/asl-videos/upload" hx-trigger="click" hx-target="#main-content" class="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg p-4 text-center">
+                  <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                  Add ASL Video
+                </a>
+                <a hx-get="/admin/social-media/generate" hx-trigger="click" hx-target="#main-content" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg p-4 text-center">
+                  <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                  </svg>
+                  Generate Social Media
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow">
+            <div class="border-b border-gray-200 px-6 py-4">
+              <h3 class="text-lg font-medium text-gray-900">System Status</h3>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-sm font-medium text-gray-700">Server Load</span>
+                    <span class="text-sm font-medium text-gray-700">28%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 28%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-sm font-medium text-gray-700">AI API Usage</span>
+                    <span class="text-sm font-medium text-gray-700">65%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 65%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-sm font-medium text-gray-700">Storage</span>
+                    <span class="text-sm font-medium text-gray-700">42%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: 42%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-sm font-medium text-gray-700">Database</span>
+                    <span class="text-sm font-medium text-gray-700">18%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 18%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Toggle active tab highlighting
+    document.addEventListener('click', function(e) {
+      if (e.target.matches('a[hx-get]') || e.target.closest('a[hx-get]')) {
+        // Remove active class from all links
+        document.querySelectorAll('nav a').forEach(el => {
+          el.classList.remove('tab-active');
+        });
+        
+        // Add active class to clicked link
+        const link = e.target.matches('a[hx-get]') ? e.target : e.target.closest('a[hx-get]');
+        link.classList.add('tab-active');
+      }
+    });
+  </script>
+</body>
+</html>

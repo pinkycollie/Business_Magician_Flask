@@ -1,0 +1,336 @@
+<div class="bg-white shadow rounded-lg p-6">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">EntrepreneursOS AI Hub</h1>
+      <p class="text-sm text-indigo-600 mt-1">Powered by Advanced AI</p>
+    </div>
+    <button class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            hx-get="/collaboration"
+            hx-target="main"
+            hx-swap="innerHTML">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 -ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+      </svg>
+      Back to Collaboration
+    </button>
+  </div>
+  
+  <!-- AI Hub Overview -->
+  <div class="mb-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg p-8">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl font-bold mb-4">Your AI-Powered Business Command Center</h2>
+      <p class="text-lg mb-6">EntrepreneursOS centralizes cutting-edge AI tools to help deaf entrepreneurs manage and grow their businesses with maximum efficiency.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+          <div class="text-3xl font-bold mb-1">25+</div>
+          <div class="text-sm">AI-Powered Tools</div>
+        </div>
+        <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+          <div class="text-3xl font-bold mb-1">10x</div>
+          <div class="text-sm">Productivity Boost</div>
+        </div>
+        <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+          <div class="text-3xl font-bold mb-1">100%</div>
+          <div class="text-sm">ASL Compatible</div>
+        </div>
+        <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+          <div class="text-3xl font-bold mb-1">24/7</div>
+          <div class="text-sm">AI Assistance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- AI Tool Categories -->
+  <div class="mb-10">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Business Lifecycle Tools</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <!-- Idea Phase -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-5 bg-blue-50 border-b border-blue-100">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-100 rounded-md p-2 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">Idea Phase</h3>
+              <p class="text-sm text-gray-500">Generate and validate ideas</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Business Idea Generator</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Market Research Assistant</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Idea Validator</span>
+            </li>
+          </ul>
+          <button class="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  hx-get="/entrepreneurs-os/ideas"
+                  hx-target="#content-area">
+            Access Tools
+          </button>
+        </div>
+      </div>
+      
+      <!-- Build Phase -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-5 bg-green-50 border-b border-green-100">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-100 rounded-md p-2 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">Build Phase</h3>
+              <p class="text-sm text-gray-500">Create business foundations</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Business Plan Writer</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Financial Projections</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Legal Document Generator</span>
+            </li>
+          </ul>
+          <button class="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  hx-get="/entrepreneurs-os/build"
+                  hx-target="#content-area">
+            Access Tools
+          </button>
+        </div>
+      </div>
+      
+      <!-- Grow Phase -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-5 bg-purple-50 border-b border-purple-100">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-purple-100 rounded-md p-2 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">Grow Phase</h3>
+              <p class="text-sm text-gray-500">Scale your business</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Marketing Campaign Creator</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Sales Strategy Generator</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Customer Acquisition Planner</span>
+            </li>
+          </ul>
+          <button class="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  hx-get="/entrepreneurs-os/grow"
+                  hx-target="#content-area">
+            Access Tools
+          </button>
+        </div>
+      </div>
+      
+      <!-- Manage Phase -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div class="p-5 bg-red-50 border-b border-red-100">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-red-100 rounded-md p-2 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">Manage Phase</h3>
+              <p class="text-sm text-gray-500">Optimize operations</p>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Financial Health Analyzer</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Operations Optimizer</span>
+            </li>
+            <li class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Team Performance Analyst</span>
+            </li>
+          </ul>
+          <button class="mt-4 w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  hx-get="/entrepreneurs-os/manage"
+                  hx-target="#content-area">
+            Access Tools
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Special AI Features -->
+  <div class="mb-10">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Special AI Features</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Northwest Agent Integration -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="relative h-48 bg-gray-800">
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+          </div>
+          <div class="absolute top-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-1 text-xs font-semibold text-indigo-600">
+            AI Agent
+          </div>
+        </div>
+        <div class="p-5">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Northwest Agent</h3>
+          <p class="text-sm text-gray-600 mb-4">Advanced AI agent that learns your business and automates complex processes across all partners.</p>
+          <button class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  hx-get="/entrepreneurs-os/northwest-agent"
+                  hx-target="#content-area">
+            Learn more
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- ASL AI Translator -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="relative h-48 bg-gray-800">
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-600 to-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+          </div>
+          <div class="absolute top-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-1 text-xs font-semibold text-blue-600">
+            Translation
+          </div>
+        </div>
+        <div class="p-5">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">ASL AI Translator</h3>
+          <p class="text-sm text-gray-600 mb-4">Real-time ASL translation and interpretation services using advanced computer vision AI.</p>
+          <button class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  hx-get="/entrepreneurs-os/asl-translator"
+                  hx-target="#content-area">
+            Learn more
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Business Analytics Engine -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="relative h-48 bg-gray-800">
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-yellow-500 to-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div class="absolute top-4 left-4 bg-white bg-opacity-90 rounded-lg px-3 py-1 text-xs font-semibold text-yellow-600">
+            Analytics
+          </div>
+        </div>
+        <div class="p-5">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Business Analytics Engine</h3>
+          <p class="text-sm text-gray-600 mb-4">Predictive analytics and business intelligence powered by AI to make data-driven decisions.</p>
+          <button class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  hx-get="/entrepreneurs-os/business-analytics"
+                  hx-target="#content-area">
+            Learn more
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- EntrepreneursOS API Hub -->
+  <div class="mb-6">
+    <div class="bg-gray-100 rounded-lg p-6 border border-gray-200">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+        <div class="mb-4 md:mb-0 md:mr-6">
+          <h3 class="text-lg font-bold text-gray-900">EntrepreneursOS API Hub</h3>
+          <p class="text-sm text-gray-600 mt-1">Connect your business systems with our partner ecosystem through our unified API platform</p>
+        </div>
+        <button class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                hx-get="/entrepreneurs-os/api-hub"
+                hx-target="#content-area">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+          Access API Hub
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Content area for loading AI tools -->
+  <div id="content-area" class="border-t border-gray-200 pt-6">
+    <!-- Selected AI tool will load here -->
+  </div>
+</div>

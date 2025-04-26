@@ -1,0 +1,197 @@
+<div>
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">Upload Content</h2>
+    <p class="text-gray-600">Add new content to the 360 Business Magician platform</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <form id="upload-content-form" hx-post="/api/admin/content/upload" hx-trigger="submit" hx-target="#main-content" enctype="multipart/form-data">
+        <!-- Basic Information -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Content Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="content-title" class="block text-sm font-medium text-gray-700">Title</label>
+              <input type="text" name="title" id="content-title" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+            </div>
+            <div>
+              <label for="content-type" class="block text-sm font-medium text-gray-700">Content Type</label>
+              <select id="content-type" name="contentType" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a content type</option>
+                <option value="article">Article</option>
+                <option value="video">Video</option>
+                <option value="guide">Guide</option>
+                <option value="template">Template</option>
+                <option value="infographic">Infographic</option>
+                <option value="checklist">Checklist</option>
+                <option value="tool">Interactive Tool</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" name="description" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required placeholder="Provide a brief description of this content"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Details -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Business Lifecycle Phase</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="lifecycle-phase" class="block text-sm font-medium text-gray-700">Phase</label>
+              <select id="lifecycle-phase" name="lifecyclePhase" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a phase</option>
+                <option value="idea">Idea Phase</option>
+                <option value="build">Build Phase</option>
+                <option value="grow">Grow Phase</option>
+                <option value="manage">Manage Phase</option>
+                <option value="all">All Phases</option>
+              </select>
+            </div>
+            <div>
+              <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+              <select id="category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a category</option>
+                <option value="business-planning">Business Planning</option>
+                <option value="legal">Legal</option>
+                <option value="financial">Financial</option>
+                <option value="marketing">Marketing</option>
+                <option value="operations">Operations</option>
+                <option value="accessibility">Accessibility</option>
+                <option value="human-resources">Human Resources</option>
+                <option value="technology">Technology</option>
+                <option value="education">Education</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label for="keywords" class="block text-sm font-medium text-gray-700">Keywords</label>
+              <input type="text" name="keywords" id="keywords" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Enter keywords separated by commas">
+              <p class="mt-2 text-sm text-gray-500">Help users find this content by adding relevant keywords.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Upload -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">File Upload</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Content File</label>
+              <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div class="space-y-1 text-center">
+                  <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="flex text-sm text-gray-600">
+                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <span>Upload a file</span>
+                      <input id="file-upload" name="file" type="file" class="sr-only" required>
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs text-gray-500">
+                    PDF, DOC, DOCX, PPTX, XLSX, JPG, PNG, MP4, MP3 up to 50MB
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnail Image (if applicable) -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Thumbnail (Optional)</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Thumbnail Image</label>
+              <div class="mt-1 flex items-center">
+                <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                  <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </span>
+                <label for="thumbnail-upload" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                  <span>Upload a thumbnail</span>
+                  <input id="thumbnail-upload" name="thumbnail" type="file" accept="image/*" class="sr-only">
+                </label>
+              </div>
+              <p class="mt-2 text-sm text-gray-500">Recommended size: 600x400 pixels</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASL Video Version -->
+        <div class="mb-8">
+          <div class="relative flex items-start">
+            <div class="flex items-center h-5">
+              <input id="include-asl" name="includeASL" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="include-asl" class="font-medium text-gray-700">This content has an ASL version</label>
+              <p class="text-gray-500">Check this if you're uploading ASL video version of this content</p>
+            </div>
+          </div>
+          
+          <div class="mt-4 ml-7" id="asl-video-upload" style="display: none;">
+            <label class="block text-sm font-medium text-gray-700">ASL Video File</label>
+            <div class="mt-1 flex items-center">
+              <label for="asl-video-upload" class="bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                <span>Upload ASL video</span>
+                <input id="asl-video-upload" name="aslVideo" type="file" accept="video/*" class="sr-only">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3">
+          <button type="button" hx-get="/admin/content" hx-trigger="click" hx-target="#main-content" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Upload Content
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const includeASLCheckbox = document.getElementById('include-asl');
+      const aslVideoUpload = document.getElementById('asl-video-upload');
+      
+      if (includeASLCheckbox && aslVideoUpload) {
+        includeASLCheckbox.addEventListener('change', function() {
+          if (this.checked) {
+            aslVideoUpload.style.display = 'block';
+          } else {
+            aslVideoUpload.style.display = 'none';
+          }
+        });
+      }
+      
+      // Show file name when file is selected
+      const fileUpload = document.getElementById('file-upload');
+      if (fileUpload) {
+        fileUpload.addEventListener('change', function() {
+          const fileName = this.files[0] ? this.files[0].name : '';
+          const fileInfoElement = document.createElement('p');
+          fileInfoElement.className = 'mt-2 text-sm text-gray-500';
+          fileInfoElement.textContent = 'Selected file: ' + fileName;
+          
+          // Remove any previous file info
+          const prevFileInfo = this.parentNode.parentNode.parentNode.querySelector('p[class="mt-2 text-sm text-gray-500"]');
+          if (prevFileInfo) {
+            prevFileInfo.remove();
+          }
+          
+          this.parentNode.parentNode.parentNode.appendChild(fileInfoElement);
+        });
+      }
+    });
+  </script>
+</div>

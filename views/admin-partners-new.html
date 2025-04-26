@@ -1,0 +1,132 @@
+<div>
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">Add New Partner</h2>
+    <p class="text-gray-600">Add a new service provider to the EntrepreneursOS Partners Ecosystem</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <form id="add-partner-form" hx-post="/api/admin/partners" hx-trigger="submit" hx-target="#main-content">
+        <!-- Basic Information -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="partner-name" class="block text-sm font-medium text-gray-700">Partner Name</label>
+              <input type="text" name="name" id="partner-name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+            </div>
+            <div>
+              <label for="partner-email" class="block text-sm font-medium text-gray-700">Contact Email</label>
+              <input type="email" name="email" id="partner-email" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+            </div>
+            <div>
+              <label for="partner-website" class="block text-sm font-medium text-gray-700">Website URL</label>
+              <input type="url" name="website" id="partner-website" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+            </div>
+            <div>
+              <label for="partner-category" class="block text-sm font-medium text-gray-700">Category</label>
+              <select id="partner-category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a category</option>
+                <option value="legal">Legal Services</option>
+                <option value="financial">Financial Services</option>
+                <option value="technology">Technology</option>
+                <option value="marketing">Marketing</option>
+                <option value="business">Business Services</option>
+                <option value="education">Education</option>
+                <option value="accessibility">Accessibility</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Partner Details -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Partner Details</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="service-type" class="block text-sm font-medium text-gray-700">Service Type</label>
+              <input type="text" name="serviceType" id="service-type" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., Legal documentation, Tax preparation">
+            </div>
+            <div>
+              <label for="partner-since" class="block text-sm font-medium text-gray-700">Partner Since</label>
+              <input type="date" name="partnerSince" id="partner-since" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <div class="md:col-span-2">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" name="description" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Describe the partner's services and how they benefit deaf entrepreneurs"></textarea>
+              <p class="mt-2 text-sm text-gray-500">Brief description of the partner and their services.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Integration Settings -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Integration Settings</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="api-key" class="block text-sm font-medium text-gray-700">API Key (if applicable)</label>
+              <input type="text" name="apiKey" id="api-key" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Enter API key for service integration">
+              <p class="mt-2 text-sm text-gray-500">Leave blank if not using API integration.</p>
+            </div>
+            <div>
+              <label for="api-endpoint" class="block text-sm font-medium text-gray-700">API Endpoint (if applicable)</label>
+              <input type="text" name="apiEndpoint" id="api-endpoint" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., https://api.partner.com/v1">
+            </div>
+            <div class="md:col-span-2">
+              <label for="webhook-url" class="block text-sm font-medium text-gray-700">Webhook URL (if applicable)</label>
+              <input type="text" name="webhookUrl" id="webhook-url" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., https://partner.com/webhook">
+            </div>
+          </div>
+        </div>
+
+        <!-- Logo Upload -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Partner Logo</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Logo Image</label>
+              <div class="mt-1 flex items-center">
+                <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                  <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </span>
+                <label for="file-upload" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                  <span>Upload a file</span>
+                  <input id="file-upload" name="logo" type="file" accept="image/*" class="sr-only">
+                </label>
+              </div>
+              <p class="mt-2 text-sm text-gray-500">PNG, JPG, GIF up to 1MB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Partner Status</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+              <select id="status" name="status" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3">
+          <button type="button" hx-get="/admin/partners" hx-trigger="click" hx-target="#main-content" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Add Partner
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

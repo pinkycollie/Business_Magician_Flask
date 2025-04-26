@@ -1,0 +1,193 @@
+<div>
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">Upload ASL Video</h2>
+    <p class="text-gray-600">Add a new ASL video to the 360 Business Magician platform</p>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white shadow overflow-hidden rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <form id="asl-video-upload-form" hx-post="/api/admin/asl-videos/upload" hx-trigger="submit" hx-target="#main-content" enctype="multipart/form-data">
+        <!-- Basic Information -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Video Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="video-title" class="block text-sm font-medium text-gray-700">Title</label>
+              <input type="text" name="title" id="video-title" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+            </div>
+            <div>
+              <label for="video-category" class="block text-sm font-medium text-gray-700">Category</label>
+              <select id="video-category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a category</option>
+                <option value="business-terms">Business Terms</option>
+                <option value="guides">Guides</option>
+                <option value="tutorials">Tutorials</option>
+                <option value="explanations">Explanations</option>
+                <option value="case-studies">Case Studies</option>
+                <option value="interviews">Interviews</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" name="description" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required placeholder="Provide a brief description of this ASL video"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Details -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Business Lifecycle Phase</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="lifecycle-phase" class="block text-sm font-medium text-gray-700">Phase</label>
+              <select id="lifecycle-phase" name="lifecyclePhase" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select a phase</option>
+                <option value="idea">Idea Phase</option>
+                <option value="build">Build Phase</option>
+                <option value="grow">Grow Phase</option>
+                <option value="manage">Manage Phase</option>
+                <option value="all">All Phases</option>
+              </select>
+            </div>
+            <div>
+              <label for="interpreter" class="block text-sm font-medium text-gray-700">ASL Interpreter</label>
+              <select id="interpreter" name="interpreter" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                <option value="">Select interpreter</option>
+                <option value="amy-smith">Amy Smith</option>
+                <option value="marcus-johnson">Marcus Johnson</option>
+                <option value="sarah-chen">Sarah Chen</option>
+                <option value="robert-johnson">Robert Johnson</option>
+                <option value="aisha-patel">Aisha Patel</option>
+                <option value="john-davis">John Davis</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label for="keywords" class="block text-sm font-medium text-gray-700">Keywords</label>
+              <input type="text" name="keywords" id="keywords" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Enter keywords separated by commas">
+              <p class="mt-2 text-sm text-gray-500">Help users find this video by adding relevant keywords.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Upload -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Video File</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">ASL Video File</label>
+              <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div class="space-y-1 text-center">
+                  <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="flex text-sm text-gray-600">
+                    <label for="video-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <span>Upload a video</span>
+                      <input id="video-upload" name="video" type="file" class="sr-only" accept="video/*" required>
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs text-gray-500">
+                    MP4, MOV, WEBM up to 200MB
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnail Image -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Thumbnail Image</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Video Thumbnail</label>
+              <div class="mt-1 flex items-center">
+                <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                  <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </span>
+                <label for="thumbnail-upload" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                  <span>Upload a thumbnail</span>
+                  <input id="thumbnail-upload" name="thumbnail" type="file" accept="image/*" class="sr-only">
+                </label>
+              </div>
+              <p class="mt-2 text-sm text-gray-500">If no thumbnail is provided, one will be automatically generated from the video.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transcript Options -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Transcript</h3>
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <div class="relative flex items-start">
+                <div class="flex items-center h-5">
+                  <input id="auto-generate-transcript" name="generateTranscript" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" checked>
+                </div>
+                <div class="ml-3 text-sm">
+                  <label for="auto-generate-transcript" class="font-medium text-gray-700">Auto-generate transcript</label>
+                  <p class="text-gray-500">Automatically generate a text transcript of this ASL video</p>
+                </div>
+              </div>
+              
+              <div class="mt-4" id="transcript-field" style="display: none;">
+                <label for="transcript" class="block text-sm font-medium text-gray-700">Transcript Text</label>
+                <textarea id="transcript" name="transcript" rows="4" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="Enter transcript text if not auto-generating"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3">
+          <button type="button" hx-get="/admin/asl-videos" hx-trigger="click" hx-target="#main-content" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <button type="submit" class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Upload Video
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const autoGenerateCheckbox = document.getElementById('auto-generate-transcript');
+      const transcriptField = document.getElementById('transcript-field');
+      
+      if (autoGenerateCheckbox && transcriptField) {
+        autoGenerateCheckbox.addEventListener('change', function() {
+          if (this.checked) {
+            transcriptField.style.display = 'none';
+          } else {
+            transcriptField.style.display = 'block';
+          }
+        });
+      }
+      
+      // Show file name when video is selected
+      const videoUpload = document.getElementById('video-upload');
+      if (videoUpload) {
+        videoUpload.addEventListener('change', function() {
+          const fileName = this.files[0] ? this.files[0].name : '';
+          const fileInfoElement = document.createElement('p');
+          fileInfoElement.className = 'mt-2 text-sm text-gray-500';
+          fileInfoElement.textContent = 'Selected video: ' + fileName;
+          
+          // Remove any previous file info
+          const prevFileInfo = this.parentNode.parentNode.parentNode.querySelector('p.mt-2.text-sm.text-gray-500:not(:first-child)');
+          if (prevFileInfo) {
+            prevFileInfo.remove();
+          }
+          
+          this.parentNode.parentNode.parentNode.appendChild(fileInfoElement);
+        });
+      }
+    });
+  </script>
+</div>
