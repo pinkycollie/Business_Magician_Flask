@@ -12,7 +12,8 @@ import {
   insertBusinessSchema,
   insertVRCounselorSchema,
   insertUserCounselorSchema,
-  insertResourceSchema
+  insertResourceSchema,
+  insertAslDictionaryTermSchema
 } from "@shared/schema";
 import storageRoutes from "./routes/storage";
 import pipelineRoutes from "./routes/pipeline";
@@ -481,6 +482,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const resourceId = parseInt(req.params.id);
       await storage.deleteResource(resourceId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // ASL Dictionary routes
+  app.get("/api/asl-dictionary", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const importance = req.query.importance as string | undefined;
+      const searchTerm = req.query.searchTerm as string | undefined;
+      
+      const tags = req.query.tags ? 
+        Array.isArray(req.query.tags) 
+          ? req.query.tags as string[] 
+          : [req.query.tags as string]
+        : undefined;
+      
+      const terms = await storage.getAslDictionaryTerms({ 
+        category, 
+        importance, 
+        tags, 
+        searchTerm 
+      });
+      res.json(terms);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/asl-dictionary/term/:name", async (req, res) => {
+    try {
+      const name = req.params.name;
+      const term = await storage.getAslDictionaryTermByName(name);
+      if (!term) {
+        return res.status(404).json({ error: "ASL dictionary term not found" });
+      }
+      res.json(term);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/asl-dictionary/:id", async (req, res) => {
+    try {
+      const termId = parseInt(req.params.id);
+      const term = await storage.getAslDictionaryTerm(termId);
+      if (!term) {
+        return res.status(404).json({ error: "ASL dictionary term not found" });
+      }
+      res.json(term);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/asl-dictionary", async (req, res) => {
+    try {
+      const termData = insertAslDictionaryTermSchema.parse(req.body);
+      const term = await storage.createAslDictionaryTerm(termData);
+      res.status(201).json(term);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: fromZodError(error).message });
+      } else {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  });
+
+  app.patch("/api/asl-dictionary/:id", async (req, res) => {
+    try {
+      const termId = parseInt(req.params.id);
+      // Partial validation
+      const updateSchema = insertAslDictionaryTermSchema.partial();
+      const termData = updateSchema.parse(req.body);
+      
+      const term = await storage.updateAslDictionaryTerm(termId, termData);
+      res.json(term);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: fromZodError(error).message });
+      } else {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  });
+
+  app.delete("/api/asl-dictionary/:id", async (req, res) => {
+    try {
+      const termId = parseInt(req.params.id);
+      await storage.deleteAslDictionaryTerm(termId);
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });

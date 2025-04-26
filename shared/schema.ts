@@ -355,3 +355,34 @@ export const insertProviderApiKeySchema = createInsertSchema(providerApiKeys).pi
 
 export type ProviderApiKey = typeof providerApiKeys.$inferSelect;
 export type InsertProviderApiKey = z.infer<typeof insertProviderApiKeySchema>;
+
+// ASL Business Dictionary
+export const aslDictionaryTerms = pgTable("asl_dictionary_terms", {
+  id: serial("id").primaryKey(),
+  term: text("term").notNull().unique(),
+  definition: text("definition").notNull(),
+  category: text("category").notNull(),
+  videoUrl: text("video_url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  signHints: text("sign_hints"),
+  importance: text("importance").default("medium"), // beginner, intermediate, advanced
+  tags: text("tags").array(),
+  relatedTerms: text("related_terms").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAslDictionaryTermSchema = createInsertSchema(aslDictionaryTerms).pick({
+  term: true,
+  definition: true,
+  category: true,
+  videoUrl: true,
+  thumbnailUrl: true,
+  signHints: true,
+  importance: true,
+  tags: true,
+  relatedTerms: true,
+});
+
+export type AslDictionaryTerm = typeof aslDictionaryTerms.$inferSelect;
+export type InsertAslDictionaryTerm = z.infer<typeof insertAslDictionaryTermSchema>;

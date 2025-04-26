@@ -9,7 +9,8 @@ import {
   businesses, type Business, type InsertBusiness,
   vrCounselors, type VRCounselor, type InsertVRCounselor,
   userCounselors, type UserCounselor, type InsertUserCounselor,
-  resources, type Resource, type InsertResource
+  resources, type Resource, type InsertResource,
+  aslDictionaryTerms, type AslDictionaryTerm, type InsertAslDictionaryTerm
 } from "@shared/schema";
 import { DatabaseStorage } from './database';
 
@@ -75,6 +76,19 @@ export interface IStorage {
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, data: Partial<InsertResource>): Promise<Resource>;
   deleteResource(id: number): Promise<void>;
+  
+  // ASL Dictionary
+  getAslDictionaryTerms(params?: { 
+    category?: string;
+    importance?: string;
+    tags?: string[];
+    searchTerm?: string;
+  }): Promise<AslDictionaryTerm[]>;
+  getAslDictionaryTerm(id: number): Promise<AslDictionaryTerm | undefined>;
+  getAslDictionaryTermByName(term: string): Promise<AslDictionaryTerm | undefined>;
+  createAslDictionaryTerm(term: InsertAslDictionaryTerm): Promise<AslDictionaryTerm>;
+  updateAslDictionaryTerm(id: number, data: Partial<InsertAslDictionaryTerm>): Promise<AslDictionaryTerm>;
+  deleteAslDictionaryTerm(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -89,6 +103,7 @@ export class MemStorage implements IStorage {
   private vrCounselors: Map<number, VRCounselor>;
   private userCounselors: Map<number, UserCounselor>;
   private resources: Map<number, Resource>;
+  private aslDictionaryTerms: Map<number, AslDictionaryTerm>;
   
   private userIdCounter: number;
   private phaseIdCounter: number;
@@ -101,6 +116,7 @@ export class MemStorage implements IStorage {
   private counselorIdCounter: number;
   private userCounselorIdCounter: number;
   private resourceIdCounter: number;
+  private aslDictionaryTermIdCounter: number;
 
   constructor() {
     this.users = new Map();
@@ -114,6 +130,7 @@ export class MemStorage implements IStorage {
     this.vrCounselors = new Map();
     this.userCounselors = new Map();
     this.resources = new Map();
+    this.aslDictionaryTerms = new Map();
     
     this.userIdCounter = 1;
     this.phaseIdCounter = 1;
@@ -126,6 +143,7 @@ export class MemStorage implements IStorage {
     this.counselorIdCounter = 1;
     this.userCounselorIdCounter = 1;
     this.resourceIdCounter = 1;
+    this.aslDictionaryTermIdCounter = 1;
     
     // Initialize with seed data
     this.seedData();
@@ -432,6 +450,89 @@ export class MemStorage implements IStorage {
     
     this.resources.delete(id);
   }
+  
+  // ASL Dictionary methods
+  async getAslDictionaryTerms(params?: { 
+    category?: string;
+    importance?: string;
+    tags?: string[];
+    searchTerm?: string;
+  }): Promise<AslDictionaryTerm[]> {
+    let terms = Array.from(this.aslDictionaryTerms.values());
+    
+    if (params) {
+      if (params.category) {
+        terms = terms.filter(term => term.category === params.category);
+      }
+      
+      if (params.importance) {
+        terms = terms.filter(term => term.importance === params.importance);
+      }
+      
+      if (params.tags && params.tags.length > 0) {
+        terms = terms.filter(term => {
+          if (!term.tags) return false;
+          return params.tags!.some(tag => term.tags!.includes(tag));
+        });
+      }
+      
+      if (params.searchTerm) {
+        const searchTermLower = params.searchTerm.toLowerCase();
+        terms = terms.filter(term => 
+          term.term.toLowerCase().includes(searchTermLower) || 
+          term.definition.toLowerCase().includes(searchTermLower)
+        );
+      }
+    }
+    
+    // Sort alphabetically by term
+    return terms.sort((a, b) => a.term.localeCompare(b.term));
+  }
+  
+  async getAslDictionaryTerm(id: number): Promise<AslDictionaryTerm | undefined> {
+    return this.aslDictionaryTerms.get(id);
+  }
+  
+  async getAslDictionaryTermByName(term: string): Promise<AslDictionaryTerm | undefined> {
+    return Array.from(this.aslDictionaryTerms.values()).find(
+      (dictTerm) => dictTerm.term.toLowerCase() === term.toLowerCase()
+    );
+  }
+  
+  async createAslDictionaryTerm(term: InsertAslDictionaryTerm): Promise<AslDictionaryTerm> {
+    const id = this.aslDictionaryTermIdCounter++;
+    const newTerm: AslDictionaryTerm = { 
+      ...term, 
+      id, 
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.aslDictionaryTerms.set(id, newTerm);
+    return newTerm;
+  }
+  
+  async updateAslDictionaryTerm(id: number, data: Partial<InsertAslDictionaryTerm>): Promise<AslDictionaryTerm> {
+    const term = this.aslDictionaryTerms.get(id);
+    if (!term) {
+      throw new Error(`ASL Dictionary term with id ${id} not found`);
+    }
+    
+    const updatedTerm: AslDictionaryTerm = { 
+      ...term, 
+      ...data, 
+      updatedAt: new Date() 
+    };
+    this.aslDictionaryTerms.set(id, updatedTerm);
+    return updatedTerm;
+  }
+  
+  async deleteAslDictionaryTerm(id: number): Promise<void> {
+    if (!this.aslDictionaryTerms.has(id)) {
+      throw new Error(`ASL Dictionary term with id ${id} not found`);
+    }
+    
+    this.aslDictionaryTerms.delete(id);
+  }
 
   // Seed initial data for development
   private seedData() {
@@ -598,6 +699,128 @@ export class MemStorage implements IStorage {
         this.aslVideos.set(id, { ...video, id });
       });
     }
+    
+    // ASL Dictionary Terms
+    const dictionaryTerms = [
+      {
+        term: "Business Plan",
+        definition: "A written document that describes your business, its objectives, strategies, market, and financial forecasts.",
+        category: "Business Planning",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/business-plan.mp4",
+        tags: ["Planning", "Strategy", "Fundamentals"],
+        exampleUsage: "Every entrepreneur should create a business plan before starting their company."
+      },
+      {
+        term: "LLC",
+        definition: "Limited Liability Company - a business structure that protects owners from personal liability while providing flexibility and tax benefits.",
+        category: "Legal",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/llc.mp4",
+        tags: ["Legal", "Business Structure"],
+        exampleUsage: "I formed an LLC to separate my personal assets from my business liabilities."
+      },
+      {
+        term: "Profit Margin",
+        definition: "The percentage of revenue that represents profit after all expenses are deducted.",
+        category: "Finance",
+        importance: "Medium",
+        videoUrl: "/api/asl-videos/dictionary/profit-margin.mp4",
+        tags: ["Finance", "Accounting"],
+        exampleUsage: "To increase our profit margin, we need to either raise prices or reduce costs."
+      },
+      {
+        term: "Market Research",
+        definition: "The process of gathering and analyzing information about your target market, customers, and competitors.",
+        category: "Marketing",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/market-research.mp4",
+        tags: ["Marketing", "Research", "Strategy"],
+        exampleUsage: "Before launching our product, we conducted market research to understand customer needs."
+      },
+      {
+        term: "ROI",
+        definition: "Return on Investment - a performance measure used to evaluate the efficiency or profitability of an investment.",
+        category: "Finance",
+        importance: "Medium",
+        videoUrl: "/api/asl-videos/dictionary/roi.mp4",
+        tags: ["Finance", "Metrics"],
+        exampleUsage: "Our marketing campaign generated a 300% ROI, which is excellent."
+      },
+      {
+        term: "Bootstrapping",
+        definition: "Starting and growing a business using only personal finances and revenue without external funding.",
+        category: "Financing",
+        importance: "Medium",
+        videoUrl: "/api/asl-videos/dictionary/bootstrapping.mp4",
+        tags: ["Finance", "Startup"],
+        exampleUsage: "Many successful companies began by bootstrapping until they reached profitability."
+      },
+      {
+        term: "MVP",
+        definition: "Minimum Viable Product - the most basic version of your product that can be released to test concepts and gather feedback.",
+        category: "Product Development",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/mvp.mp4",
+        tags: ["Product", "Development", "Testing"],
+        exampleUsage: "We launched an MVP to test market interest before investing in a full-featured product."
+      },
+      {
+        term: "Cash Flow",
+        definition: "The movement of money in and out of your business; positive cash flow means more money coming in than going out.",
+        category: "Finance",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/cash-flow.mp4",
+        tags: ["Finance", "Accounting"],
+        exampleUsage: "Maintaining positive cash flow is essential for keeping your business operational."
+      },
+      {
+        term: "Value Proposition",
+        definition: "A statement that clearly explains how your product solves customers' problems, delivers specific benefits, and tells the ideal customer why they should buy from you.",
+        category: "Marketing",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/value-proposition.mp4",
+        tags: ["Marketing", "Strategy"],
+        exampleUsage: "Our value proposition focuses on saving customers time and reducing stress."
+      },
+      {
+        term: "EIN",
+        definition: "Employer Identification Number - a unique nine-digit number assigned by the IRS to business entities for tax purposes.",
+        category: "Legal",
+        importance: "High",
+        videoUrl: "/api/asl-videos/dictionary/ein.mp4",
+        tags: ["Legal", "Taxes"],
+        exampleUsage: "Before hiring employees, you'll need to obtain an EIN from the IRS."
+      },
+      {
+        term: "Break-even Point",
+        definition: "The point at which total revenue equals total costs, resulting in neither profit nor loss.",
+        category: "Finance",
+        importance: "Medium",
+        videoUrl: "/api/asl-videos/dictionary/break-even-point.mp4",
+        tags: ["Finance", "Accounting"],
+        exampleUsage: "We calculated that we need to sell 1,000 units to reach our break-even point."
+      },
+      {
+        term: "Pivot",
+        definition: "A significant business strategy shift or correction to test a new approach regarding a company's offering or target market.",
+        category: "Strategy",
+        importance: "Medium",
+        videoUrl: "/api/asl-videos/dictionary/pivot.mp4",
+        tags: ["Strategy", "Adaptation"],
+        exampleUsage: "After receiving market feedback, we decided to pivot from a B2C to a B2B business model."
+      }
+    ];
+    
+    dictionaryTerms.forEach(term => {
+      const id = this.aslDictionaryTermIdCounter++;
+      this.aslDictionaryTerms.set(id, { 
+        ...term, 
+        id, 
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    });
     
     // VR Counselors
     const counselors = [

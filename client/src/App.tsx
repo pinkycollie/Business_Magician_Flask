@@ -12,7 +12,9 @@ import {
   Settings,
   UserIcon,
   BookOpen,
-  Map
+  Map,
+  Library,
+  BookMarked
 } from 'lucide-react';
 
 // Import our components
@@ -23,6 +25,7 @@ import StartupTeamBuilder from '@/components/vr4deaf/StartupTeamBuilder';
 import ProfilePage from '@/pages/profile-page';
 import TechLeadershipResources from '@/components/resources/TechLeadershipResources';
 import JourneyTrackerPage from '@/pages/journey-tracker-page';
+import ResourceLibraryPage from '@/pages/resource-library-page';
 
 export default function App() {
   const [navCollapsed, setNavCollapsed] = useState(false);
@@ -95,6 +98,13 @@ export default function App() {
               active={location === '/resources'} 
             />
             <NavItem 
+              to="/resource-library" 
+              icon={<Library className="h-5 w-5" />} 
+              text="Resource Library" 
+              collapsed={navCollapsed} 
+              active={location === '/resource-library'} 
+            />
+            <NavItem 
               to="/journey" 
               icon={<Map className="h-5 w-5" />} 
               text="Journey Tracker" 
@@ -142,6 +152,7 @@ export default function App() {
           <Route path="/profile" component={ProfilePage} />
           <Route path="/profile/:username" component={ProfilePage} />
           <Route path="/resources" component={TechLeadershipResources} />
+          <Route path="/resource-library" component={ResourceLibraryPage} />
           <Route path="/journey" component={JourneyTrackerPage} />
           <Route component={NotFoundScreen} />
         </Switch>
@@ -280,6 +291,12 @@ function HomeScreen() {
               <Link href="/resources">
                 <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
                   Explore Tech Leadership Resources
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </a>
+              </Link>
+              <Link href="/resource-library">
+                <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
+                  Browse SBA Resource Library
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </a>
               </Link>
