@@ -77,6 +77,47 @@ app.get('/api/profile/:username', (req, res) => {
   });
 });
 
+// Leadership resources endpoints
+app.get('/api/resources/leadership', (req, res) => {
+  res.json({
+    categories: [
+      { id: 'leadership', name: 'Leadership', count: 12 },
+      { id: 'management', name: 'Engineering Management', count: 8 },
+      { id: 'hiring', name: 'Hiring & Team Building', count: 5 },
+      { id: 'architecture', name: 'Technical Architecture', count: 7 },
+      { id: 'security', name: 'Security & Compliance', count: 4 },
+      { id: 'ai', name: 'AI & ML Resources', count: 6 },
+      { id: 'growth', name: 'Growth & Scaling', count: 9 },
+    ],
+    featuredResources: [
+      {
+        id: 1,
+        title: 'The CTO Handbook',
+        url: 'https://github.com/kuchin/awesome-cto',
+        description: 'A comprehensive collection of resources for CTOs, organized by topic.',
+        category: 'leadership',
+        hasASL: true,
+      },
+      {
+        id: 4,
+        title: 'The Startup CTO\'s Handbook',
+        url: 'https://github.com/ZachGoldberg/Startup-CTO-Handbook',
+        description: 'A comprehensive resource for technical founders and CTOs of startups.',
+        category: 'leadership',
+        hasASL: true,
+      },
+      {
+        id: 7,
+        title: 'Accessible AI Implementation',
+        url: 'https://github.com/collections/ai-model-development',
+        description: 'AI resources with a focus on accessibility and inclusive design.',
+        category: 'ai',
+        hasASL: true,
+      }
+    ]
+  });
+});
+
 // Simple error handler
 app.use((err, req, res, next) => {
   console.error('Server error:', err);

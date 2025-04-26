@@ -10,7 +10,9 @@ import {
   Headphones,
   Users,
   Settings,
-  UserIcon
+  UserIcon,
+  BookOpen,
+  Map
 } from 'lucide-react';
 
 // Import our components
@@ -19,6 +21,8 @@ import VR4DeafDashboard from '@/components/vr4deaf/VR4DeafDashboard';
 import JobSupportDashboard from '@/components/vr4deaf/JobSupportDashboard';
 import StartupTeamBuilder from '@/components/vr4deaf/StartupTeamBuilder';
 import ProfilePage from '@/pages/profile-page';
+import TechLeadershipResources from '@/components/resources/TechLeadershipResources';
+import JourneyTrackerPage from '@/pages/journey-tracker-page';
 
 export default function App() {
   const [navCollapsed, setNavCollapsed] = useState(false);
@@ -84,6 +88,20 @@ export default function App() {
               active={location === '/profile' || location.includes('/profile/')} 
             />
             <NavItem 
+              to="/resources" 
+              icon={<BookOpen className="h-5 w-5" />} 
+              text="Tech Leadership" 
+              collapsed={navCollapsed} 
+              active={location === '/resources'} 
+            />
+            <NavItem 
+              to="/journey" 
+              icon={<Map className="h-5 w-5" />} 
+              text="Journey Tracker" 
+              collapsed={navCollapsed} 
+              active={location === '/journey'} 
+            />
+            <NavItem 
               to="/settings" 
               icon={<Settings className="h-5 w-5" />} 
               text="Settings" 
@@ -123,6 +141,8 @@ export default function App() {
           <Route path="/settings" component={SettingsScreen} />
           <Route path="/profile" component={ProfilePage} />
           <Route path="/profile/:username" component={ProfilePage} />
+          <Route path="/resources" component={TechLeadershipResources} />
+          <Route path="/journey" component={JourneyTrackerPage} />
           <Route component={NotFoundScreen} />
         </Switch>
       </main>
@@ -250,11 +270,25 @@ function HomeScreen() {
               All 360 Magicians modules are powered by PinkSync technology, providing seamless ASL communication, 
               video translation, interpreter services, and deaf-friendly workflows throughout your business journey.
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-3">
               <Badge color="purple">ASL Video Support</Badge>
               <Badge color="purple">Real-time Interpretation</Badge>
               <Badge color="purple">Deaf-Friendly AI</Badge>
               <Badge color="purple">Accessibility-First Design</Badge>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/resources">
+                <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
+                  Explore Tech Leadership Resources
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </a>
+              </Link>
+              <Link href="/journey">
+                <a className="inline-flex items-center text-purple-600 font-medium hover:text-purple-800">
+                  Track Your Business Journey
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </a>
+              </Link>
             </div>
           </div>
         </div>
