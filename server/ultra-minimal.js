@@ -881,6 +881,39 @@ app.get('/collaboration/asl-support', (req, res) => {
   }
 });
 
+// Interactive 360-degree Business Journey Experience
+app.get('/interactive-journey', (req, res) => {
+  try {
+    const interactiveJourneyHtml = fs.readFileSync(path.join(__dirname, '../views/interactive-360-experience.html'), 'utf8');
+    res.send(interactiveJourneyHtml);
+  } catch (error) {
+    console.error('Error loading interactive 360-degree journey page:', error);
+    res.status(500).send('Error loading interactive 360-degree journey page');
+  }
+});
+
+// Corporate Formation Services
+app.get('/corporate-services', (req, res) => {
+  try {
+    const corporateServicesHtml = fs.readFileSync(path.join(__dirname, '../views/corporate-services.html'), 'utf8');
+    res.send(corporateServicesHtml);
+  } catch (error) {
+    console.error('Error loading corporate services page:', error);
+    res.status(500).send('Error loading corporate services page');
+  }
+});
+
+// Butch - Deaf First AI Assistant
+app.get('/butch-ai', (req, res) => {
+  try {
+    const butchAiHtml = fs.readFileSync(path.join(__dirname, '../views/butch-ai-assistant.html'), 'utf8');
+    res.send(butchAiHtml);
+  } catch (error) {
+    console.error('Error loading Butch AI assistant page:', error);
+    res.status(500).send('Error loading Butch AI assistant page');
+  }
+});
+
 // Admin API Endpoints
 // Add Partner API
 app.post('/api/admin/partners', (req, res) => {
@@ -1002,6 +1035,240 @@ app.post('/collaboration/reaction', (req, res) => {
   // In a real app, this would broadcast reactions to all users
   console.log('Reaction:', req.body);
   res.send("");
+});
+
+// Small Business Management API integration endpoints
+app.get('/api/business-journey/phases', (req, res) => {
+  // Return the business journey phases data for the 360 interactive experience
+  const phases = [
+    {
+      id: 'idea',
+      name: 'Idea Development',
+      description: 'Develop and validate your business concept',
+      progress: 0,
+      tools: [
+        { id: 'idea-validation', name: 'Idea Validation Tool', description: 'Validate your business idea' },
+        { id: 'market-research', name: 'Market Research Tool', description: 'Research your target market' }
+      ]
+    },
+    {
+      id: 'build',
+      name: 'Business Building',
+      description: 'Create your business foundation and structure',
+      progress: 0,
+      tools: [
+        { id: 'business-plan', name: 'Business Plan Creator', description: 'Create your business plan' },
+        { id: 'legal-structure', name: 'Legal Structure Selector', description: 'Choose your legal structure' }
+      ]
+    },
+    {
+      id: 'grow',
+      name: 'Business Growth',
+      description: 'Market and expand your business',
+      progress: 0,
+      tools: [
+        { id: 'marketing-plan', name: 'Marketing Plan Creator', description: 'Create your marketing strategy' },
+        { id: 'funding-options', name: 'Funding Options Explorer', description: 'Explore funding opportunities' }
+      ]
+    },
+    {
+      id: 'manage',
+      name: 'Business Management',
+      description: 'Operate and optimize your business',
+      progress: 0,
+      tools: [
+        { id: 'operations-manager', name: 'Operations Manager', description: 'Streamline your operations' },
+        { id: 'financial-dashboard', name: 'Financial Dashboard', description: 'Monitor financial health' }
+      ]
+    },
+    {
+      id: 'exit',
+      name: 'Exit Strategy',
+      description: 'Plan your business transition or sale',
+      progress: 0,
+      tools: [
+        { id: 'exit-strategy', name: 'Exit Strategy Creator', description: 'Create your exit plan' },
+        { id: 'business-valuation', name: 'Business Valuation Tool', description: 'Value your business' }
+      ]
+    }
+  ];
+  
+  res.json(phases);
+});
+
+// API endpoint to get business resources by phase
+app.get('/api/business-journey/resources/:phaseId', (req, res) => {
+  const phaseId = req.params.phaseId;
+  
+  // Sample resources tailored for deaf entrepreneurs for each phase
+  const resourcesByPhase = {
+    'idea': [
+      { id: 1, title: 'Market Research Guide', type: 'guide', aslVersion: true },
+      { id: 2, title: 'Business Idea Validation Checklist', type: 'checklist', aslVersion: true },
+      { id: 3, title: 'Deaf Entrepreneur Case Studies', type: 'case-study', aslVersion: true },
+      { id: 4, title: 'SBA Resources for Deaf Entrepreneurs', type: 'external-resource', aslVersion: false }
+    ],
+    'build': [
+      { id: 5, title: 'Business Plan Template for Deaf Entrepreneurs', type: 'template', aslVersion: true },
+      { id: 6, title: 'Legal Structures Comparison', type: 'guide', aslVersion: true },
+      { id: 7, title: 'Accessible Business Registration Guide', type: 'guide', aslVersion: true },
+      { id: 8, title: 'SBA Business Plan Resources', type: 'external-resource', aslVersion: false }
+    ],
+    'grow': [
+      { id: 9, title: 'Deaf-Accessible Marketing Strategies', type: 'guide', aslVersion: true },
+      { id: 10, title: 'Funding Options for Deaf Entrepreneurs', type: 'guide', aslVersion: true },
+      { id: 11, title: 'Brand Identity Development Guide', type: 'guide', aslVersion: true },
+      { id: 12, title: 'SBA Growth Resources', type: 'external-resource', aslVersion: false }
+    ],
+    'manage': [
+      { id: 13, title: 'Accessible Operations Manual Template', type: 'template', aslVersion: true },
+      { id: 14, title: 'Financial Health Monitoring Guide', type: 'guide', aslVersion: true },
+      { id: 15, title: 'Tax Compliance for Deaf Business Owners', type: 'guide', aslVersion: true },
+      { id: 16, title: 'SBA Management Resources', type: 'external-resource', aslVersion: false }
+    ],
+    'exit': [
+      { id: 17, title: 'Exit Strategy Planning Guide', type: 'guide', aslVersion: true },
+      { id: 18, title: 'Business Valuation Methods', type: 'guide', aslVersion: true },
+      { id: 19, title: 'Succession Planning for Deaf Entrepreneurs', type: 'guide', aslVersion: true },
+      { id: 20, title: 'SBA Exit Strategy Resources', type: 'external-resource', aslVersion: false }
+    ]
+  };
+  
+  if (resourcesByPhase[phaseId]) {
+    res.json(resourcesByPhase[phaseId]);
+  } else {
+    res.status(404).json({ error: 'Phase not found' });
+  }
+});
+
+// Butch AI Assistant API endpoints
+app.post('/api/butch/chat', (req, res) => {
+  const message = req.body.message;
+  
+  // In a production environment, this would call the actual AI service
+  // For now, we'll provide context-aware responses based on keywords
+  let response = '';
+  let hasASL = true;
+  
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+  
+  // Generate contextual responses based on message content
+  if (message.toLowerCase().includes('llc') || message.toLowerCase().includes('register')) {
+    response = 'To register an LLC, you\'ll need to:\n\n1. Choose a unique business name\n2. File Articles of Organization with your state\n3. Pay the filing fee (typically $50-$500)\n4. Create an Operating Agreement\n5. Get an EIN from the IRS\n\nOur formation services can handle this entire process for you with full ASL support throughout.';
+  } 
+  else if (message.toLowerCase().includes('legal structure') || message.toLowerCase().includes('structure')) {
+    response = 'For deaf entrepreneurs, the best legal structure depends on your specific situation:\n\n• LLC: Great for protection and flexibility\n• Corporation: Good for raising capital and growth\n• Nonprofit: For mission-driven organizations\n\nMany deaf-owned businesses choose LLCs for the personal liability protection without complex corporate requirements. Would you like me to explain each option in more detail?';
+  }
+  else if (message.toLowerCase().includes('business plan')) {
+    response = 'I can help you create a business plan with these key sections:\n\n1. Executive Summary\n2. Company Description\n3. Market Analysis\n4. Organization Structure\n5. Product/Service Line\n6. Marketing Strategy\n7. Financial Projections\n\nWe have templates specifically designed for deaf entrepreneurs with visual guides and ASL videos for each section. Would you like to see our template?';
+  }
+  else if (message.toLowerCase().includes('funding')) {
+    response = 'Funding options for deaf entrepreneurs include:\n\n• SBA loans with accessibility accommodations\n• Grants for disability-owned businesses\n• Angel investors focused on accessibility\n• Crowdfunding campaigns\n• Vocational Rehabilitation business funding\n\nMany deaf business owners have success with programs specifically designed for underrepresented founders. I can provide specific resources for each option.';
+  }
+  else if (message.toLowerCase().includes('tool')) {
+    response = 'Deaf-accessible business tools include:\n\n• Video remote interpreting for client meetings\n• Visual alert systems for office environments\n• Real-time captioning for webinars and calls\n• ASL-fluent virtual assistants\n• Collaborative platforms with visual-centric features\n\nOur 360 Business Magician platform integrates many of these tools into its collaboration features. Would you like to see how these tools work in practice?';
+  }
+  else {
+    response = 'Thanks for your question! I\'m here to provide customized guidance for deaf entrepreneurs. To give you the most helpful answer, could you tell me a bit more about your specific business needs or which stage of business formation you\'re currently in?';
+  }
+  
+  // Generate suggestions based on the message
+  let suggestions = [];
+  if (message.toLowerCase().includes('llc') || message.toLowerCase().includes('register')) {
+    suggestions = [
+      'What does LLC formation cost?',
+      'How long does LLC formation take?',
+      'What is an operating agreement?',
+      'Do I need a registered agent?',
+      'Can I convert my LLC later?'
+    ];
+  } 
+  else if (message.toLowerCase().includes('legal structure')) {
+    suggestions = [
+      'Tell me more about LLCs',
+      'What are the tax benefits?',
+      'Is sole proprietorship better?',
+      'How is a corporation different?',
+      'What permits do I need?'
+    ];
+  }
+  else if (message.toLowerCase().includes('business plan')) {
+    suggestions = [
+      'How long should a business plan be?',
+      'Show me financial projection examples',
+      'What goes in an executive summary?',
+      'Do I need a business plan for funding?',
+      'Visual business plan templates'
+    ];
+  }
+  else if (message.toLowerCase().includes('funding')) {
+    suggestions = [
+      'Tell me about SBA loans',
+      'Grants for deaf business owners',
+      'How to create a pitch deck',
+      'VR business funding options',
+      'Crowdfunding platforms'
+    ];
+  }
+  else if (message.toLowerCase().includes('tool')) {
+    suggestions = [
+      'Video remote interpreting services',
+      'Visual alert systems for offices',
+      'ASL-accessible accounting tools',
+      'Team collaboration platforms',
+      'Customer service with VRS'
+    ];
+  } else {
+    suggestions = [
+      'How do I register an LLC?',
+      'What legal structure is best for deaf entrepreneurs?',
+      'Help me create a business plan',
+      'How do I get funding for my business?',
+      'What deaf-accessible tools can help my business?'
+    ];
+  }
+  
+  // Simulate processing delay for a more realistic experience
+  setTimeout(() => {
+    res.json({
+      message: response,
+      hasASL: hasASL,
+      suggestions: suggestions,
+      timestamp: new Date().toISOString()
+    });
+  }, 500);
+});
+
+// Corporate Services API endpoints
+app.post('/api/service-selections', (req, res) => {
+  // In a production environment, this would save the user's selections to a database
+  // For now, we'll just return a success message with a confirmation
+  
+  setTimeout(() => {
+    const html = `
+      <div class="bg-green-50 p-6 rounded-lg border border-green-200 text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-green-800 mb-2">Application Submitted Successfully!</h3>
+        <p class="text-green-700 mb-6">Thank you for choosing 360 Business Magician. Our deaf-accessible support team will contact you within 1 business day to begin your business formation journey.</p>
+        <div class="flex justify-center space-x-4">
+          <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            Return to Home
+          </a>
+          <a href="/butch-ai" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Chat with Butch AI
+          </a>
+        </div>
+      </div>
+    `;
+    
+    res.send(html);
+  }, 1500); // Simulate server processing time
 });
 
 // Start the HTTP server
