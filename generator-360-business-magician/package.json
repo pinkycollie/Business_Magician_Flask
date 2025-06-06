@@ -1,0 +1,46 @@
+{
+  "name": "generator-360-business-magician",
+  "version": "1.0.0",
+  "description": "Yeoman generator for 360 Business Magician components and features",
+  "homepage": "https://github.com/pinksync/360-business-magician-generator",
+  "author": {
+    "name": "PinkSync",
+    "email": "team@pinksync.com",
+    "url": "https://pinksync.com"
+  },
+  "files": [
+    "generators"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "yeoman-generator",
+    "business",
+    "deaf-first",
+    "accessibility",
+    "asl",
+    "react",
+    "htmx",
+    "typescript"
+  ],
+  "devDependencies": {
+    "yeoman-test": "^8.2.0",
+    "yeoman-assert": "^3.1.1"
+  },
+  "dependencies": {
+    "yeoman-generator": "^5.10.0",
+    "chalk": "^4.1.2",
+    "yosay": "^2.0.2"
+  },
+  "engines": {
+    "npm": ">= 4.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pinksync/360-business-magician-generator.git"
+  },
+  "scripts": {
+    "test": "npm test",
+    "prepublishOnly": "npm test"
+  }
+}

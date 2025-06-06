@@ -1,0 +1,156 @@
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+{{#if hasAuth}}
+import { useAuth } from '@/hooks/use-auth';
+{{/if}}
+{{#if hasRealtime}}
+import { useWebSocket } from '@/hooks/use-websocket';
+{{/if}}
+import { use{{pascalCase name}} } from '@/hooks/use{{pascalCase name}}';
+
+export default function {{pascalCase name}}Page() {
+  const { toast } = useToast();
+  {{#if hasAuth}}
+  const { user } = useAuth();
+  {{/if}}
+  const queryClient = useQueryClient();
+  
+  const {
+    {{camelCase name}}s,
+    isLoading,
+    create{{pascalCase name}},
+    update{{pascalCase name}},
+    delete{{pascalCase name}}
+  } = use{{pascalCase name}}();
+
+  {{#if hasRealtime}}
+  const { isConnected } = useWebSocket('/{{kebabCase name}}', {
+    onMessage: (data) => {
+      // Handle real-time updates
+      queryClient.invalidateQueries({ queryKey: ['/api/{{kebabCase name}}'] });
+    }
+  });
+  {{/if}}
+
+  const handleCreate = () => {
+    create{{pascalCase name}}.mutate({
+      name: 'New {{titleCase name}}',
+      description: ''
+    }, {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: '{{titleCase name}} created successfully'
+        });
+      }
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">{{titleCase name}}</h1>
+          <p className="text-muted-foreground">
+            Manage your {{lowerCase name}} efficiently
+          </p>
+        </div>
+        <div className="flex items-center space-x-4">
+          {{#if hasRealtime}}
+          <div className="flex items-center space-x-2">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className="text-sm text-muted-foreground">
+              {isConnected ? 'Connected' : 'Disconnected'}
+            </span>
+          </div>
+          {{/if}}
+          <Button onClick={handleCreate} disabled={create{{pascalCase name}}.isPending}>
+            Create {{titleCase name}}
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid gap-6">
+        {{{camelCase name}}s?.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-2">No {{titleCase name}}s Yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Get started by creating your first {{lowerCase name}}
+                </p>
+                <Button onClick={handleCreate}>
+                  Create Your First {{titleCase name}}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {{{camelCase name}}s?.map((item) => (
+              <Card key={item.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-start">
+                    <span className="truncate">{item.name}</span>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          // Navigate to edit page or open modal
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          delete{{pascalCase name}}.mutate(item.id, {
+                            onSuccess: () => {
+                              toast({
+                                title: 'Deleted',
+                                description: '{{titleCase name}} deleted successfully'
+                              });
+                            }
+                          });
+                        }}
+                        disabled={delete{{pascalCase name}}.isPending}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </CardTitle>
+                  {item.description && (
+                    <CardDescription className="line-clamp-2">
+                      {item.description}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground">
+                    Created: {new Date(item.createdAt).toLocaleDateString()}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

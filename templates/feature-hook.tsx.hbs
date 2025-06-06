@@ -1,0 +1,94 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+{{#if hasAuth}}
+import { useAuth } from '@/hooks/use-auth';
+{{/if}}
+
+export interface {{pascalCase name}} {
+  id: number;
+  name: string;
+  description?: string;
+  {{#if hasAuth}}
+  userId: number;
+  {{/if}}
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Create{{pascalCase name}}Data {
+  name: string;
+  description?: string;
+}
+
+export interface Update{{pascalCase name}}Data {
+  name?: string;
+  description?: string;
+}
+
+export function use{{pascalCase name}}() {
+  {{#if hasAuth}}
+  const { user } = useAuth();
+  {{/if}}
+  const queryClient = useQueryClient();
+
+  // Query for fetching all {{camelCase name}}s
+  const {
+    data: {{camelCase name}}s,
+    isLoading,
+    error
+  } = useQuery<{{pascalCase name}}[]>({
+    queryKey: ['/api/{{kebabCase name}}'],
+    enabled: {{#if hasAuth}}!!user{{else}}true{{/if}}
+  });
+
+  // Query for fetching a single {{camelCase name}}
+  const use{{pascalCase name}}ById = (id: number) => {
+    return useQuery<{{pascalCase name}}>({
+      queryKey: ['/api/{{kebabCase name}}', id],
+      enabled: {{#if hasAuth}}!!user && {{/if}}!!id
+    });
+  };
+
+  // Mutation for creating a {{camelCase name}}
+  const create{{pascalCase name}} = useMutation({
+    mutationFn: async (data: Create{{pascalCase name}}Data) => {
+      const response = await apiRequest('POST', '/api/{{kebabCase name}}', data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/{{kebabCase name}}'] });
+    }
+  });
+
+  // Mutation for updating a {{camelCase name}}
+  const update{{pascalCase name}} = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Update{{pascalCase name}}Data }) => {
+      const response = await apiRequest('PUT', `/api/{{kebabCase name}}/${id}`, data);
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/{{kebabCase name}}'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/{{kebabCase name}}', variables.id] });
+    }
+  });
+
+  // Mutation for deleting a {{camelCase name}}
+  const delete{{pascalCase name}} = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest('DELETE', `/api/{{kebabCase name}}/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/{{kebabCase name}}'] });
+    }
+  });
+
+  return {
+    {{camelCase name}}s,
+    isLoading,
+    error,
+    use{{pascalCase name}}ById,
+    create{{pascalCase name}},
+    update{{pascalCase name}},
+    delete{{pascalCase name}}
+  };
+}
