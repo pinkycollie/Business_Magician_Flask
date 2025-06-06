@@ -1,0 +1,168 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { storage } from '../storage';
+{{#if auth}}
+import { requireAuth } from '../middleware/auth';
+{{/if}}
+
+const router = Router();
+
+{{#if validation}}
+// Validation schemas
+const create{{pascalCase name}}Schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().optional(),
+  // Add more fields as needed
+});
+
+const update{{pascalCase name}}Schema = create{{pascalCase name}}Schema.partial();
+{{/if}}
+
+{{#if (includes methods 'get')}}
+// GET /api/{{kebabCase name}} - List all {{lowerCase name}}
+router.get('/', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const items = await storage.get{{pascalCase name}}s({{#if auth}}req.user.id{{/if}});
+    res.json(items);
+  } catch (error) {
+    console.error('Error fetching {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to fetch {{lowerCase name}}' });
+  }
+});
+
+// GET /api/{{kebabCase name}}/:id - Get specific {{lowerCase name}}
+router.get('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const item = await storage.get{{pascalCase name}}(id);
+    if (!item) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (item.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    res.json(item);
+  } catch (error) {
+    console.error('Error fetching {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to fetch {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'post')}}
+// POST /api/{{kebabCase name}} - Create new {{lowerCase name}}
+router.post('/', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    {{#if validation}}
+    const validatedData = create{{pascalCase name}}Schema.parse(req.body);
+    {{else}}
+    const validatedData = req.body;
+    {{/if}}
+
+    const newItem = await storage.create{{pascalCase name}}({
+      ...validatedData,
+      {{#if auth}}
+      userId: req.user.id,
+      {{/if}}
+    });
+
+    res.status(201).json(newItem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
+    console.error('Error creating {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to create {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'put')}}
+// PUT /api/{{kebabCase name}}/:id - Update {{lowerCase name}}
+router.put('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    {{#if validation}}
+    const validatedData = update{{pascalCase name}}Schema.parse(req.body);
+    {{else}}
+    const validatedData = req.body;
+    {{/if}}
+
+    // Check if item exists
+    const existingItem = await storage.get{{pascalCase name}}(id);
+    if (!existingItem) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (existingItem.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    const updatedItem = await storage.update{{pascalCase name}}(id, validatedData);
+    res.json(updatedItem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
+    console.error('Error updating {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to update {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'delete')}}
+// DELETE /api/{{kebabCase name}}/:id - Delete {{lowerCase name}}
+router.delete('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    // Check if item exists
+    const existingItem = await storage.get{{pascalCase name}}(id);
+    if (!existingItem) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (existingItem.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    await storage.delete{{pascalCase name}}(id);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to delete {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+export default router;

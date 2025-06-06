@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titleCase name}} - 360 Business Magician</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-blue-600">360 Business Magician</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/butch-ai" class="text-gray-600 hover:text-blue-600">Butch AI</a>
+                    <a href="/interactive-journey" class="text-gray-600 hover:text-blue-600">Journey</a>
+                    <a href="/corporate-services" class="text-gray-600 hover:text-blue-600">Services</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">{{titleCase name}}</h1>
+                <p class="mt-2 text-gray-600">
+                    {{#if (eq type 'tool')}}
+                    Powerful business tool to help you {{lowerCase name}}
+                    {{else if (eq type 'widget')}}
+                    Dashboard widget for {{lowerCase name}} management
+                    {{else if (eq type 'form')}}
+                    Complete form for {{lowerCase name}} processing
+                    {{else}}
+                    {{titleCase name}} functionality for your business
+                    {{/if}}
+                </p>
+            </div>
+
+            {{#if aslSupport}}
+            <!-- ASL Video Section -->
+            <div class="mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">ASL Instructions</h2>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/2">
+                            <video 
+                                class="w-full rounded-lg shadow-sm"
+                                controls
+                                poster="/asl/{{kebabCase name}}-poster.jpg"
+                            >
+                                <source src="/asl/{{kebabCase name}}-intro.mp4" type="video/mp4">
+                                <track kind="captions" src="/asl/{{kebabCase name}}-captions.vtt" srclang="en" label="English">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <div class="md:w-1/2">
+                            <h3 class="text-lg font-medium mb-2">Video Description</h3>
+                            <p class="text-gray-600 mb-4">
+                                This ASL video provides a comprehensive introduction to {{titleCase name}}, 
+                                including step-by-step instructions and important tips for deaf entrepreneurs.
+                            </p>
+                            <div class="space-y-2">
+                                <button class="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100">
+                                    📹 Play Introduction
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100">
+                                    📝 View Transcript
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100">
+                                    💬 Ask Butch AI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+
+            <!-- Main Content Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Primary Content -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6">
+                            {{#if (eq type 'tool')}}
+                            <!-- Business Tool Interface -->
+                            <div x-data="{{camelCase name}}Tool()">
+                                <div class="mb-6">
+                                    <h3 class="text-lg font-semibold mb-4">{{titleCase name}} Configuration</h3>
+                                    <form hx-post="/api/{{kebabCase name}}/process" hx-target="#results">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                    Primary Input
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    name="primaryInput"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    placeholder="Enter your input..."
+                                                >
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                    Options
+                                                </label>
+                                                <select name="options" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    <option value="option1">Option 1</option>
+                                                    <option value="option2">Option 2</option>
+                                                    <option value="option3">Option 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <button 
+                                                type="submit" 
+                                                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                Process {{titleCase name}}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="results" class="mt-6">
+                                    <!-- Results will be loaded here -->
+                                </div>
+                            </div>
+                            {{else if (eq type 'form')}}
+                            <!-- Form Interface -->
+                            <form hx-post="/api/{{kebabCase name}}/submit" hx-target="#form-results">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Required Field
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            name="requiredField"
+                                            required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Description
+                                        </label>
+                                        <textarea 
+                                            name="description"
+                                            rows="4"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        ></textarea>
+                                    </div>
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                    >
+                                        Submit {{titleCase name}}
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="form-results" class="mt-6">
+                                <!-- Form results will appear here -->
+                            </div>
+                            {{else}}
+                            <!-- General Content -->
+                            <div class="text-center py-12">
+                                <h3 class="text-xl font-semibold mb-4">{{titleCase name}}</h3>
+                                <p class="text-gray-600 mb-6">
+                                    Welcome to {{titleCase name}}. Configure this section based on your specific needs.
+                                </p>
+                                <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                                    Get Started
+                                </button>
+                            </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="space-y-6">
+                        <!-- Quick Actions -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                            <div class="space-y-2">
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    📊 View Analytics
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    💬 Ask Butch AI
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    📋 Export Data
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    ⚙️ Settings
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Help & Resources -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Help & Resources</h3>
+                            <div class="space-y-3">
+                                <a href="/help/{{kebabCase name}}" class="block text-blue-600 hover:text-blue-800">
+                                    📖 User Guide
+                                </a>
+                                <a href="/asl/{{kebabCase name}}" class="block text-blue-600 hover:text-blue-800">
+                                    🎥 ASL Tutorials
+                                </a>
+                                <a href="/community/{{kebabCase name}}" class="block text-blue-600 hover:text-blue-800">
+                                    👥 Community Forum
+                                </a>
+                                <a href="/support" class="block text-blue-600 hover:text-blue-800">
+                                    🆘 Get Support
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {{#if (eq type 'tool')}}
+    <script>
+        function {{camelCase name}}Tool() {
+            return {
+                loading: false,
+                results: null,
+                
+                init() {
+                    console.log('{{titleCase name}} tool initialized');
+                },
+                
+                processData() {
+                    this.loading = true;
+                    // Add your processing logic here
+                    setTimeout(() => {
+                        this.loading = false;
+                        this.results = 'Processing complete!';
+                    }, 2000);
+                }
+            }
+        }
+    </script>
+    {{/if}}
+</body>
+</html>

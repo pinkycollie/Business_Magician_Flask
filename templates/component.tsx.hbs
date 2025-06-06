@@ -1,0 +1,113 @@
+import React from 'react';
+{{#if aslSupport}}
+import { ASLVideoPlayer } from '@/components/asl/ASLVideoPlayer';
+{{/if}}
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+interface {{pascalCase name}}Props {
+  className?: string;
+  {{#if aslSupport}}
+  aslVideoUrl?: string;
+  {{/if}}
+}
+
+export function {{pascalCase name}}({ className{{#if aslSupport}}, aslVideoUrl{{/if}} }: {{pascalCase name}}Props) {
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>{{titleCase name}}</CardTitle>
+        <CardDescription>
+          {{#if (eq type 'tool')}}
+          Business tool component for {{titleCase name}}
+          {{else if (eq type 'widget')}}
+          Dashboard widget for {{titleCase name}}
+          {{else if (eq type 'form')}}
+          Form component for {{titleCase name}}
+          {{else}}
+          Component for {{titleCase name}}
+          {{/if}}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {{#if aslSupport}}
+        <div className="mb-6">
+          <ASLVideoPlayer
+            videoUrl={aslVideoUrl || "/asl/{{kebabCase name}}-intro.mp4"}
+            title="{{titleCase name}} ASL Introduction"
+            className="w-full max-w-md mx-auto"
+          />
+        </div>
+        {{/if}}
+        
+        <div className="space-y-4">
+          {{#if (eq type 'tool')}}
+          {/* Business tool interface */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Tool Features</h3>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  Feature 1
+                </li>
+                <li className="flex items-center text-sm">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  Feature 2
+                </li>
+              </ul>
+            </div>
+            <div>
+              <Button className="w-full">
+                Start {{titleCase name}}
+              </Button>
+            </div>
+          </div>
+          {{else if (eq type 'widget')}}
+          {/* Dashboard widget interface */}
+          <div className="text-center">
+            <div className="text-2xl font-bold text-primary mb-2">
+              Widget Data
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Real-time {{titleCase name}} information
+            </p>
+          </div>
+          {{else if (eq type 'form')}}
+          {/* Form interface */}
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Field Name
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Enter value..."
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Submit {{titleCase name}}
+            </Button>
+          </form>
+          {{else}}
+          {/* General component interface */}
+          <div className="text-center py-8">
+            <h3 className="text-lg font-semibold mb-2">
+              {{titleCase name}} Component
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Configure this component for your specific needs
+            </p>
+            <Button>
+              Configure
+            </Button>
+          </div>
+          {{/if}}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default {{pascalCase name}};

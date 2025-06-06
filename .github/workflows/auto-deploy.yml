@@ -1,0 +1,108 @@
+name: Auto Deploy 360 Business Magician
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '20'
+  REPLIT_DEPLOYMENT: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run type checking
+      run: npm run typecheck
+    
+    - name: Run linting
+      run: npm run lint
+    
+    - name: Run tests
+      run: npm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: dist/
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-files
+        path: dist/
+    
+    - name: Deploy to Replit Staging
+      env:
+        REPLIT_TOKEN: ${{ secrets.REPLIT_TOKEN }}
+        DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      run: |
+        echo "Deploying to staging environment..."
+        # Add Replit deployment commands here
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-files
+        path: dist/
+    
+    - name: Deploy to Replit Production
+      env:
+        REPLIT_TOKEN: ${{ secrets.REPLIT_TOKEN }}
+        DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        NORTHWEST_API_KEY: ${{ secrets.NORTHWEST_API_KEY }}
+      run: |
+        echo "Deploying to production environment..."
+        # Add Replit deployment commands here
