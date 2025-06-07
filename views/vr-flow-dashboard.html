@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Business Flow Dashboard - 360 Business Magician</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="/assets/360-business-magician-logo.jpg" alt="360 Business Magician" class="h-8 w-8 mr-3">
+                    <span class="text-xl font-bold text-blue-600">VR Business Flow</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/butch-ai" class="text-gray-600 hover:text-blue-600">Butch AI</a>
+                    <a href="/interactive-journey" class="text-gray-600 hover:text-blue-600">Journey</a>
+                    <a href="/corporate-services" class="text-gray-600 hover:text-blue-600">Services</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">VR Business Flow Management</h1>
+                <p class="mt-2 text-gray-600">
+                    Complete automation from partner referral to business launch
+                </p>
+            </div>
+
+            <!-- Flow Diagram -->
+            <div class="mb-8 bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Business Flow Pipeline</h2>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <!-- Initial Contact -->
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <h3 class="font-semibold text-blue-800">Initial Contact</h3>
+                        <div class="text-sm text-blue-600 mt-2 space-y-1">
+                            <div>A: Partner Referral API</div>
+                            <div>B: AI Initial Interview</div>
+                            <div>C: Data Collection</div>
+                            <div>D: Profile Analysis</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Assessment -->
+                    <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <h3 class="font-semibold text-green-800">Assessment</h3>
+                        <div class="text-sm text-green-600 mt-2 space-y-1">
+                            <div>E: VR Eligibility Check</div>
+                            <div>F: Business Readiness</div>
+                            <div>G: Service Classification</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Service Planning -->
+                    <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <h3 class="font-semibold text-yellow-800">Service Planning</h3>
+                        <div class="text-sm text-yellow-600 mt-2 space-y-1">
+                            <div>H: Core VR Services</div>
+                            <div>I: Add-on Services</div>
+                            <div>J: Workspace Setup</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Implementation -->
+                    <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                        <h3 class="font-semibold text-purple-800">Implementation</h3>
+                        <div class="text-sm text-purple-600 mt-2 space-y-1">
+                            <div>K: Taskade Project</div>
+                            <div>L: AI Agent Assignment</div>
+                            <div>M: Notion Database</div>
+                            <div>N: Progress Monitoring</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Partner Integration -->
+                    <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                        <h3 class="font-semibold text-red-800">Partner Integration</h3>
+                        <div class="text-sm text-red-600 mt-2 space-y-1">
+                            <div>O: MBTQ Insurance API</div>
+                            <div>P: Tax Services API</div>
+                            <div>Q: Business Partners</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Client Intake -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Client Intake Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6 border-b">
+                            <h2 class="text-xl font-semibold">New Client Intake</h2>
+                            <p class="text-gray-600">Start the automated VR business flow</p>
+                        </div>
+                        <div class="p-6">
+                            <form hx-post="/api/vr-flow/start" hx-target="#flow-result" hx-indicator="#loading">
+                                <div class="space-y-4">
+                                    <!-- Referral Source -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Referral Source
+                                        </label>
+                                        <select name="source" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Select referral source</option>
+                                            <option value="vr_agency">VR Agency Direct</option>
+                                            <option value="partner_organization">Partner Organization</option>
+                                            <option value="self_referral">Self Referral</option>
+                                            <option value="community_outreach">Community Outreach</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Client Information -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                Client Name
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                name="clientInfo[name]"
+                                                required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Full name"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                Email Address
+                                            </label>
+                                            <input 
+                                                type="email" 
+                                                name="clientInfo[email]"
+                                                required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="email@example.com"
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                Phone Number
+                                            </label>
+                                            <input 
+                                                type="tel" 
+                                                name="clientInfo[phone]"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="(555) 123-4567"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                Disability Type
+                                            </label>
+                                            <select name="clientInfo[disabilityType]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select primary disability</option>
+                                                <option value="hearing">Hearing Impairment</option>
+                                                <option value="visual">Visual Impairment</option>
+                                                <option value="mobility">Mobility Impairment</option>
+                                                <option value="cognitive">Cognitive Disability</option>
+                                                <option value="multiple">Multiple Disabilities</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Business Interest -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Business Interest Area
+                                        </label>
+                                        <select name="clientInfo[businessInterest]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Select business area</option>
+                                            <option value="technology">Technology Services</option>
+                                            <option value="consulting">Consulting</option>
+                                            <option value="retail">Retail/E-commerce</option>
+                                            <option value="food_service">Food Service</option>
+                                            <option value="professional_services">Professional Services</option>
+                                            <option value="creative">Creative Services</option>
+                                            <option value="manufacturing">Manufacturing</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Previous Business Experience -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Previous Business Experience
+                                        </label>
+                                        <textarea 
+                                            name="clientInfo[businessExperience]"
+                                            rows="3"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Describe any previous business experience or entrepreneurial activities..."
+                                        ></textarea>
+                                    </div>
+
+                                    <!-- Accommodation Needs -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Accommodation Needs
+                                        </label>
+                                        <div class="space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="clientInfo[accommodations]" value="asl_interpreter" class="mr-2">
+                                                ASL Interpreter
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="clientInfo[accommodations]" value="screen_reader" class="mr-2">
+                                                Screen Reader Support
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="clientInfo[accommodations]" value="mobility_access" class="mr-2">
+                                                Mobility Accessibility
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" name="clientInfo[accommodations]" value="cognitive_support" class="mr-2">
+                                                Cognitive Support Tools
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="pt-4">
+                                        <button 
+                                            type="submit" 
+                                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                                        >
+                                            Start VR Business Flow
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <!-- Loading Indicator -->
+                            <div id="loading" class="htmx-indicator mt-4 text-center">
+                                <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-blue-500 bg-blue-100">
+                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Processing VR Flow...
+                                </div>
+                            </div>
+
+                            <!-- Results -->
+                            <div id="flow-result" class="mt-6">
+                                <!-- Flow results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="space-y-6">
+                        <!-- Current Stats -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Current Statistics</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Active Flows</span>
+                                    <span class="font-semibold" hx-get="/api/vr-flow/stats/active" hx-trigger="load">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Completed Today</span>
+                                    <span class="font-semibold" hx-get="/api/vr-flow/stats/completed" hx-trigger="load">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Success Rate</span>
+                                    <span class="font-semibold text-green-600">87%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Avg Completion</span>
+                                    <span class="font-semibold">42 weeks</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Categories -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Service Categories</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Exploration & Concept</span>
+                                    <span class="text-gray-600">$122-$551</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Feasibility Studies</span>
+                                    <span class="text-gray-600">$151-$551</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Business Planning</span>
+                                    <span class="text-gray-600">$1,286-$1,780</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Supported Start-Up</span>
+                                    <span class="text-gray-600">$2,021</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Business Maintenance</span>
+                                    <span class="text-gray-600">$1,011</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Business Stability</span>
+                                    <span class="text-gray-600">$1,511</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                            <div class="space-y-2">
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    📊 View All Clients
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    📈 Analytics Dashboard
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    💬 Butch AI Assistant
+                                </button>
+                                <button class="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded">
+                                    ⚙️ Flow Configuration
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Help & Resources -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Help & Resources</h3>
+                            <div class="space-y-3">
+                                <a href="/help/vr-flow" class="block text-blue-600 hover:text-blue-800">
+                                    📖 VR Flow Guide
+                                </a>
+                                <a href="/asl/vr-tutorial" class="block text-blue-600 hover:text-blue-800">
+                                    🎥 ASL Video Tutorial
+                                </a>
+                                <a href="/api-docs" class="block text-blue-600 hover:text-blue-800">
+                                    🔗 API Documentation
+                                </a>
+                                <a href="/support" class="block text-blue-600 hover:text-blue-800">
+                                    🆘 Technical Support
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <img src="/assets/360-business-magician-logo.jpg" alt="360 Business Magician" class="h-6 w-6">
+                    <span class="text-gray-600">360 Business Magician VR Flow System</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <img src="/assets/mbtq-insurance-logo.jpg" alt="MBTQ Insurance" class="h-6 w-6">
+                    <span class="text-gray-600 text-sm">Powered by MBTQ Universe</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
