@@ -1,0 +1,30 @@
+
+version: '3.8'
+services:
+  vr-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://vr_user:vr_pass@vr-postgres:5432/vr_business_db
+    depends_on:
+      - vr-postgres
+      - vr-redis
+
+  vr-postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=vr_business_db
+      - POSTGRES_USER=vr_user
+      - POSTGRES_PASSWORD=vr_pass
+    volumes:
+      - vr_postgres_data:/var/lib/postgresql/data
+      - ./vr-schema.sql:/docker-entrypoint-initdb.d/init.sql
+
+  vr-redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  vr_postgres_data:

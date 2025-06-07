@@ -1,0 +1,310 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { storage } from '../storage';
+{{#if auth}}
+import { requireAuth } from '../middleware/auth';
+{{/if}}
+
+const router = Router();
+
+{{#if validation}}
+// Validation schemas for {{pascalCase name}}
+const create{{pascalCase name}}Schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().optional(),
+  {{#if (eq name 'vr-clients')}}
+  caseStatus: z.enum(['active', 'pending', 'completed', 'suspended']).default('pending'),
+  assignedSpecialist: z.string().min(1, 'Assigned specialist is required'),
+  currentMilestone: z.string(),
+  nextActionDate: z.string().transform(str => new Date(str)),
+  fundingEligibility: z.boolean().default(false),
+  serviceCategory: z.string(),
+  estimatedCost: z.number().positive(),
+  mapLocation: z.string().optional(),
+  {{else}}
+  // Add specific validation fields based on the endpoint type
+  {{/if}}
+});
+
+const update{{pascalCase name}}Schema = create{{pascalCase name}}Schema.partial();
+
+const query{{pascalCase name}}Schema = z.object({
+  page: z.string().transform(Number).optional(),
+  limit: z.string().transform(Number).optional(),
+  search: z.string().optional(),
+  {{#if (eq name 'vr-clients')}}
+  status: z.enum(['active', 'pending', 'completed', 'suspended']).optional(),
+  specialist: z.string().optional(),
+  {{/if}}
+});
+{{/if}}
+
+{{#if (includes methods 'get')}}
+// GET /api/{{kebabCase name}} - List all {{lowerCase name}}
+router.get('/', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    {{#if validation}}
+    const query = query{{pascalCase name}}Schema.parse(req.query);
+    {{else}}
+    const query = req.query;
+    {{/if}}
+    
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      {{#if (eq name 'vr-clients')}}
+      status,
+      specialist
+      {{/if}}
+    } = query;
+
+    const offset = (page - 1) * limit;
+    
+    const items = await storage.get{{pascalCase name}}s({
+      {{#if auth}}userId: req.user.id,{{/if}}
+      limit,
+      offset,
+      search,
+      {{#if (eq name 'vr-clients')}}
+      status,
+      specialist
+      {{/if}}
+    });
+
+    const total = await storage.count{{pascalCase name}}s({
+      {{#if auth}}userId: req.user.id,{{/if}}
+      search,
+      {{#if (eq name 'vr-clients')}}
+      status,
+      specialist
+      {{/if}}
+    });
+
+    res.json({
+      data: items,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to fetch {{lowerCase name}}' });
+  }
+});
+
+// GET /api/{{kebabCase name}}/:id - Get specific {{lowerCase name}}
+router.get('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = req.params.id;
+    
+    const item = await storage.get{{pascalCase name}}(id);
+    if (!item) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (item.userId && item.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    res.json(item);
+  } catch (error) {
+    console.error('Error fetching {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to fetch {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'post')}}
+// POST /api/{{kebabCase name}} - Create new {{lowerCase name}}
+router.post('/', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    {{#if validation}}
+    const validatedData = create{{pascalCase name}}Schema.parse(req.body);
+    {{else}}
+    const validatedData = req.body;
+    {{/if}}
+
+    const newItem = await storage.create{{pascalCase name}}({
+      ...validatedData,
+      {{#if auth}}
+      userId: req.user.id,
+      {{/if}}
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    {{#if (eq name 'vr-clients')}}
+    // Send notification to assigned specialist
+    if (validatedData.assignedSpecialist) {
+      await notifySpecialist(validatedData.assignedSpecialist, newItem);
+    }
+    {{/if}}
+
+    res.status(201).json(newItem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
+    console.error('Error creating {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to create {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'put')}}
+// PUT /api/{{kebabCase name}}/:id - Update {{lowerCase name}}
+router.put('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = req.params.id;
+    
+    {{#if validation}}
+    const validatedData = update{{pascalCase name}}Schema.parse(req.body);
+    {{else}}
+    const validatedData = req.body;
+    {{/if}}
+
+    // Check if item exists
+    const existingItem = await storage.get{{pascalCase name}}(id);
+    if (!existingItem) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (existingItem.userId && existingItem.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    const updatedItem = await storage.update{{pascalCase name}}(id, {
+      ...validatedData,
+      updatedAt: new Date()
+    });
+
+    {{#if (eq name 'vr-clients')}}
+    // Check for milestone progression
+    if (validatedData.currentMilestone && validatedData.currentMilestone !== existingItem.currentMilestone) {
+      await trackMilestoneProgress(id, validatedData.currentMilestone);
+    }
+    {{/if}}
+
+    res.json(updatedItem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      });
+    }
+    
+    console.error('Error updating {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to update {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (includes methods 'delete')}}
+// DELETE /api/{{kebabCase name}}/:id - Delete {{lowerCase name}}
+router.delete('/:id', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Check if item exists
+    const existingItem = await storage.get{{pascalCase name}}(id);
+    if (!existingItem) {
+      return res.status(404).json({ error: '{{titleCase name}} not found' });
+    }
+
+    {{#if auth}}
+    // Check ownership
+    if (existingItem.userId && existingItem.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    {{/if}}
+
+    await storage.delete{{pascalCase name}}(id);
+    
+    {{#if (eq name 'vr-clients')}}
+    // Archive related data instead of deleting
+    await storage.archiveClientData(id);
+    {{/if}}
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting {{lowerCase name}}:', error);
+    res.status(500).json({ error: 'Failed to delete {{lowerCase name}}' });
+  }
+});
+{{/if}}
+
+{{#if (eq name 'vr-clients')}}
+// VR-specific endpoints
+
+// GET /api/vr-clients/:id/milestones - Get client milestones
+router.get('/:id/milestones', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const clientId = req.params.id;
+    const milestones = await storage.getClientMilestones(clientId);
+    res.json(milestones);
+  } catch (error) {
+    console.error('Error fetching milestones:', error);
+    res.status(500).json({ error: 'Failed to fetch milestones' });
+  }
+});
+
+// POST /api/vr-clients/:id/milestones - Add milestone
+router.post('/:id/milestones', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const clientId = req.params.id;
+    const milestoneData = req.body;
+    
+    const milestone = await storage.createMilestone({
+      ...milestoneData,
+      clientId,
+      id: crypto.randomUUID(),
+      createdAt: new Date()
+    });
+    
+    res.status(201).json(milestone);
+  } catch (error) {
+    console.error('Error creating milestone:', error);
+    res.status(500).json({ error: 'Failed to create milestone' });
+  }
+});
+
+// GET /api/vr-clients/analytics/dashboard - Get dashboard analytics
+router.get('/analytics/dashboard', {{#if auth}}requireAuth, {{/if}}async (req, res) => {
+  try {
+    const analytics = await storage.getVRAnalytics({{#if auth}}req.user.id{{/if}});
+    res.json(analytics);
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+// Utility functions
+async function notifySpecialist(specialistId: string, client: any) {
+  // Send notification via email, SMS, or push notification
+  console.log(`Notifying specialist ${specialistId} about new client ${client.name}`);
+}
+
+async function trackMilestoneProgress(clientId: string, milestone: string) {
+  // Track milestone progression for analytics
+  await storage.logMilestoneProgress(clientId, milestone, new Date());
+}
+{{/if}}
+
+export default router;

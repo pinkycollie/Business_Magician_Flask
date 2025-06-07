@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph Initial_Contact
+        A[Partner Referral API] --> B[AI Initial Interview]
+        B --> C[Data Collection System]
+        C --> D[Client Profile Analysis]
+    end
+
+    subgraph Assessment
+        D --> E[VR Eligibility Check]
+        E --> F[Business Readiness Assessment]
+        F --> G[Service Category Classification]
+    end
+
+    subgraph Service_Planning
+        G --> H[Core VR Services]
+        G --> I[Add-on Services]
+        H --> J[Customized Workspace Setup]
+        I --> J
+    end
+
+    subgraph Implementation
+        J --> K[Taskade Project Generation]
+        K --> L[AI Agent Assignment]
+        K --> M[Notion Database Entry]
+        L --> N[Progress Monitoring]
+        M --> N
+    end
+
+    subgraph Partner_Integration
+        N --> O[MBTQ Insurance API]
+        N --> P[Tax Services API]
+        N --> Q[Business Service Partners]
+    end
