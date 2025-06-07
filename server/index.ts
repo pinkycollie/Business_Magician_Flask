@@ -165,15 +165,21 @@ app.use((req, res, next) => {
   });
 });
 
+// Simple health endpoint first
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'operational',
+    service: '360 Business Magician Platform',
+    flask_backend: 'https://fast-htmx-server-pinkycollie.replit.app',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Start server
 const port = parseInt(env.PORT || "5000", 10);
 const server = createServer(app);
 
-server.listen({
-  port,
-  host: "0.0.0.0",
-  reusePort: true,
-}, () => {
-  console.log(`Optimized server running on port ${port} (${app.get("env")} mode)`);
-  console.log(`Note: In deployment, external port mapping is port 80 -> ${port}`);
+server.listen(port, "0.0.0.0", () => {
+  console.log(`360 Business Magician Platform running on port ${port}`);
+  console.log(`Flask Backend: https://fast-htmx-server-pinkycollie.replit.app`);
 });
